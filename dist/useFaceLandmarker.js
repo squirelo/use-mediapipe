@@ -16,6 +16,7 @@ exports.useFaceLandmarker = exports.getFaceLandmarker = exports.defaultFaceLandm
 const react_1 = __importDefault(require("react"));
 const tasks_vision_1 = require("@mediapipe/tasks-vision");
 Object.defineProperty(exports, "FaceLandmarker", { enumerable: true, get: function () { return tasks_vision_1.FaceLandmarker; } });
+const canPlayStream_1 = __importDefault(require("./canPlayStream"));
 exports.defaultFaceLandmarkerOptions = {
     runningMode: 'VIDEO',
     numFaces: 10,
@@ -37,13 +38,19 @@ exports.getFaceLandmarker = getFaceLandmarker;
 function useFaceLandmarker({ onResults, }) {
     const videoRef = react_1.default.useRef(null);
     const faceLandmarkerRef = react_1.default.useRef();
+    const lastVideoTimeRef = react_1.default.useRef(-1);
     function predictFaceLandmarks(time, stream) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a, _b;
             if (!videoRef.current || !faceLandmarkerRef.current)
                 return;
-            const result = yield ((_a = faceLandmarkerRef.current) === null || _a === void 0 ? void 0 : _a.detectForVideo(videoRef.current, time));
-            onResults === null || onResults === void 0 ? void 0 : onResults(result, stream);
+            const startTimeMs = performance.now();
+            const currentTime = videoRef.current.currentTime;
+            if ((0, canPlayStream_1.default)(stream) && currentTime !== lastVideoTimeRef.current && videoRef.current.videoWidth > 0 && videoRef.current.videoHeight > 0) {
+                lastVideoTimeRef.current = currentTime;
+                const results = yield ((_a = faceLandmarkerRef.current) === null || _a === void 0 ? void 0 : _a.detectForVideo(videoRef.current, startTimeMs));
+                onResults === null || onResults === void 0 ? void 0 : onResults(results, stream);
+            }
             (_b = videoRef.current) === null || _b === void 0 ? void 0 : _b.requestVideoFrameCallback((time) => predictFaceLandmarks(time, stream));
         });
     }

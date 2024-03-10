@@ -2,7 +2,7 @@
 A set of React hooks to use MediaPipe.
 
 ## Install
-`yarn add use-mediapipe` or `npm install use-mediapipe --save`.
+`yarn add gwendall/use-mediapipe` or `npm install gwendall/use-mediapipe --save`.
 
 ## useFaceLandmarker
 ```typescript

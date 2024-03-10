@@ -12,9 +12,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getFaceLandmarker = exports.defaultFaceLandmarkerOptions = void 0;
+exports.getFaceLandmarker = exports.defaultFaceLandmarkerOptions = exports.FaceLandmarker = void 0;
 const react_1 = __importDefault(require("react"));
 const tasks_vision_1 = require("@mediapipe/tasks-vision");
+Object.defineProperty(exports, "FaceLandmarker", { enumerable: true, get: function () { return tasks_vision_1.FaceLandmarker; } });
 exports.defaultFaceLandmarkerOptions = {
     runningMode: 'VIDEO',
     numFaces: 10,

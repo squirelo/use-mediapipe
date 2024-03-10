@@ -7,7 +7,7 @@ export { FaceLandmarker, FaceLandmarkerOptions, FaceLandmarkerResult };
 
 export const defaultFaceLandmarkerOptions: FaceLandmarkerOptions = {
     runningMode: 'VIDEO' as RunningMode,
-    numFaces: 10,
+    numFaces: 1,
     outputFaceBlendshapes: true,
     outputFacialTransformationMatrixes: true,
 };

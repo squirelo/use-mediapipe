@@ -27,7 +27,7 @@ export async function getFaceLandmarker(options: FaceLandmarkerOptions = {}) {
     return faceLandmarker;
 }
 
-export default function useFaceLandmarker({
+export function useFaceLandmarker({
     onResults,
 }: {
     onResults: (result: FaceLandmarkerResult, stream?: MediaStream) => void;

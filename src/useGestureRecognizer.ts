@@ -24,7 +24,7 @@ export async function getGestureRecognizer(options: GestureRecognizerOptions = {
     return gestureRecognizer;
 }
 
-export default function useGestureRecognizer({
+export function useGestureRecognizer({
     onResults,
 }: {
     onResults: (result?: GestureRecognizerResult) => void;

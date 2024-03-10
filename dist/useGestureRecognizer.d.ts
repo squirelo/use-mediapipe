@@ -5,7 +5,7 @@ export declare const defaultGestureRecognizerOptions: {
     numHands: number;
 };
 export declare function getGestureRecognizer(options?: GestureRecognizerOptions): Promise<GestureRecognizer>;
-export default function useGestureRecognizer({ onResults, }: {
+export declare function useGestureRecognizer({ onResults, }: {
     onResults: (result?: GestureRecognizerResult) => void;
 }): ({ stream, gestureRecognizerOptions, }?: {
     stream?: MediaStream | undefined;

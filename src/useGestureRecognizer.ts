@@ -36,11 +36,10 @@ export function useGestureRecognizer({
 
     async function predictGesture(time: number, stream?: MediaStream) {
         if (!videoRef.current || !gestureRecognizerRef.current) return;
-        const startTimeMs = performance.now();
         const currentTime = videoRef.current.currentTime;
-        if (canPlayStream(stream) && currentTime !== lastVideoTimeRef.current && videoRef.current.videoWidth > 0 && videoRef.current.videoHeight > 0) {
+        if (canPlayStream(stream) && currentTime > lastVideoTimeRef.current && videoRef.current.videoWidth > 0 && videoRef.current.videoHeight > 0) {
             lastVideoTimeRef.current = currentTime;
-            const results = await gestureRecognizerRef.current?.recognizeForVideo(videoRef.current, startTimeMs);
+            const results = await gestureRecognizerRef.current?.recognizeForVideo(videoRef.current, time);
             onResults?.(results, stream);
         }
         videoRef.current?.requestVideoFrameCallback((time) => predictGesture(time, stream));

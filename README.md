@@ -5,7 +5,7 @@ A set of React hooks to use MediaPipe.
 `yarn add use-mediapipe` or `npm install use-mediapipe --save`.
 
 ## useFaceLandmarker
-```
+```typescript
 import { useFaceLandmarker } from "use-mediapipe";
 
 function ReactComponent() {
@@ -23,7 +23,7 @@ function ReactComponent() {
 ```
 
 ## useGestureRecognizer
-```
+```typescript
 import { useGestureRecognizer } from "use-mediapipe";
 
 function ReactComponent() {

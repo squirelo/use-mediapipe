@@ -1,6 +1,7 @@
 import React from "react";
 import { FaceLandmarker, FaceLandmarkerOptions, FaceLandmarkerResult, FilesetResolver } from "@mediapipe/tasks-vision";
 import { RunningMode } from "./types";
+import canPlayStream from "./canPlayStream";
 
 export { FaceLandmarker, FaceLandmarkerOptions, FaceLandmarkerResult };
 
@@ -40,7 +41,7 @@ export function useFaceLandmarker({
         if (!videoRef.current || !faceLandmarkerRef.current) return;
         const startTimeMs = performance.now();
         const currentTime = videoRef.current.currentTime;
-        if (currentTime !== lastVideoTimeRef.current && videoRef.current.videoWidth > 0 && videoRef.current.videoHeight > 0) {
+        if (canPlayStream(stream) && currentTime !== lastVideoTimeRef.current && videoRef.current.videoWidth > 0 && videoRef.current.videoHeight > 0) {
             lastVideoTimeRef.current = currentTime;
             const results = await faceLandmarkerRef.current?.detectForVideo(videoRef.current, startTimeMs);
             onResults?.(results, stream);

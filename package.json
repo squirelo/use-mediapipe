@@ -1,7 +1,7 @@
 {
   "name": "use-mediapipe",
   "private": true,
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "MediaPipe hooks for React",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

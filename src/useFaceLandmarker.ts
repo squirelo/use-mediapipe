@@ -2,6 +2,8 @@ import React from "react";
 import { FaceLandmarker, FaceLandmarkerOptions, FaceLandmarkerResult, FilesetResolver } from "@mediapipe/tasks-vision";
 import { RunningMode } from "./types";
 
+export { FaceLandmarker, FaceLandmarkerOptions, FaceLandmarkerResult };
+
 export const defaultFaceLandmarkerOptions: FaceLandmarkerOptions = {
     runningMode: 'VIDEO' as RunningMode,
     numFaces: 10,

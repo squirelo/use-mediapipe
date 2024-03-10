@@ -2,6 +2,8 @@ import React from "react";
 import { FilesetResolver, GestureRecognizer, GestureRecognizerOptions, GestureRecognizerResult } from "@mediapipe/tasks-vision";
 import { RunningMode } from "./types";
 
+export { GestureRecognizer, GestureRecognizerOptions, GestureRecognizerResult };
+
 export const defaultGestureRecognizerOptions = {
     runningMode: 'VIDEO' as RunningMode,
     numHands: 2,

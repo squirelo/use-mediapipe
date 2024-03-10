@@ -40,7 +40,7 @@ export function useFaceLandmarker({
         if (!videoRef.current || !faceLandmarkerRef.current) return;
         const startTimeMs = performance.now();
         const currentTime = videoRef.current.currentTime;
-        if (currentTime !== lastVideoTimeRef.current) {
+        if (currentTime !== lastVideoTimeRef.current && videoRef.current.videoWidth > 0 && videoRef.current.videoHeight > 0) {
             lastVideoTimeRef.current = currentTime;
             const results = await faceLandmarkerRef.current?.detectForVideo(videoRef.current, startTimeMs);
             onResults?.(results, stream);

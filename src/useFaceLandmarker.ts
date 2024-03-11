@@ -1,11 +1,17 @@
 import React from "react";
+import deepmerge from "deepmerge";
 import { FaceLandmarker, FaceLandmarkerOptions, FaceLandmarkerResult, FilesetResolver } from "@mediapipe/tasks-vision";
 import { RunningMode } from "./types";
 import canPlayStream from "./canPlayStream";
+import { defaultUserMediaOptions } from "./utils";
 
 export { FaceLandmarker, FaceLandmarkerOptions, FaceLandmarkerResult };
 
 export const defaultFaceLandmarkerOptions: FaceLandmarkerOptions = {
+    baseOptions: {
+        modelAssetPath: `https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task`,
+        delegate: "GPU"
+    },
     runningMode: 'VIDEO' as RunningMode,
     numFaces: 1,
     outputFaceBlendshapes: true,
@@ -14,16 +20,9 @@ export const defaultFaceLandmarkerOptions: FaceLandmarkerOptions = {
 
 export async function getFaceLandmarker(options: FaceLandmarkerOptions = {}) {
     const vision = await FilesetResolver.forVisionTasks(
-        "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3/wasm"
+        "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm"
     );
-    const faceLandmarkerOptions: FaceLandmarkerOptions = {
-        baseOptions: {
-            modelAssetPath: `https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task`,
-            delegate: "GPU"
-        },
-        ...defaultFaceLandmarkerOptions,
-        ...options,
-    };
+    const faceLandmarkerOptions: FaceLandmarkerOptions = deepmerge(defaultFaceLandmarkerOptions, options);
     const faceLandmarker = await FaceLandmarker.createFromOptions(vision, faceLandmarkerOptions);
     return faceLandmarker;
 }
@@ -47,15 +46,19 @@ export function useFaceLandmarker({
         }
         videoRef.current?.requestVideoFrameCallback((time) => predictFaceLandmarks(time, stream));
     }
+
     async function startFaceTracking({
         stream,
         faceLandmarkerOptions,
+        userMediaOptions,
     }: {
         stream?: MediaStream;
         faceLandmarkerOptions?: FaceLandmarkerOptions;
+        userMediaOptions?: MediaStreamConstraints;
     } = {
             stream: undefined,
             faceLandmarkerOptions: undefined,
+            userMediaOptions: undefined,
         }) {
         faceLandmarkerRef.current = await getFaceLandmarker(faceLandmarkerOptions);
         videoRef.current = document.createElement("video");
@@ -64,14 +67,9 @@ export function useFaceLandmarker({
         videoRef.current.playsInline = true;
         videoRef.current.crossOrigin = "anonymous";
         videoRef.current.srcObject = stream || await navigator.mediaDevices
-            .getUserMedia({
-                audio: false,
-                video: {
-                    width: { ideal: 1920 },
-                    height: { ideal: 1080 },
-                    facingMode: "user",
-                },
-            });
+            .getUserMedia(
+                deepmerge(defaultUserMediaOptions, userMediaOptions || {}),
+            );
         videoRef.current.onloadedmetadata = () => {
             videoRef.current!.play();
         };
@@ -79,5 +77,7 @@ export function useFaceLandmarker({
         videoRef.current.requestVideoFrameCallback((time) => predictFaceLandmarks(time, _stream));
 
     }
+
     return startFaceTracking;
+
 }

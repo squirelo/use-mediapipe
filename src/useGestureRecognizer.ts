@@ -2,26 +2,26 @@ import React from "react";
 import { FilesetResolver, GestureRecognizer, GestureRecognizerOptions, GestureRecognizerResult } from "@mediapipe/tasks-vision";
 import { RunningMode } from "./types";
 import canPlayStream from "./canPlayStream";
+import deepmerge from "deepmerge";
+import { defaultUserMediaOptions } from "./utils";
 
 export { GestureRecognizer, GestureRecognizerOptions, GestureRecognizerResult };
 
 export const defaultGestureRecognizerOptions = {
+    baseOptions: {
+        modelAssetPath: 'https://storage.googleapis.com/mediapipe-models/gesture_recognizer/gesture_recognizer/float16/1/gesture_recognizer.task',
+        delegate: "GPU",
+    },
     runningMode: 'VIDEO' as RunningMode,
     numHands: 2,
 }
 
 export async function getGestureRecognizer(options: GestureRecognizerOptions = {}): Promise<GestureRecognizer> {
     const tasksVision = await FilesetResolver.forVisionTasks(
-        "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3/wasm"
+        "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm"
     );
-    const gestureRecognizer = await GestureRecognizer.createFromOptions(tasksVision, {
-        baseOptions: {
-            modelAssetPath: 'https://storage.googleapis.com/mediapipe-models/gesture_recognizer/gesture_recognizer/float16/1/gesture_recognizer.task',
-            delegate: "GPU",
-        },
-        ...defaultGestureRecognizerOptions,
-        ...options,
-    });
+    const gestureRecognizerOptions: GestureRecognizerOptions = deepmerge(defaultGestureRecognizerOptions, options);
+    const gestureRecognizer = await GestureRecognizer.createFromOptions(tasksVision, gestureRecognizerOptions);
     return gestureRecognizer;
 }
 
@@ -48,9 +48,11 @@ export function useGestureRecognizer({
     async function startGestureTracking({
         stream,
         gestureRecognizerOptions,
+        userMediaOptions,
     }: {
         stream?: MediaStream;
         gestureRecognizerOptions?: GestureRecognizerOptions;
+        userMediaOptions?: MediaStreamConstraints;
     } = {
             stream: undefined,
             gestureRecognizerOptions: undefined,
@@ -60,14 +62,9 @@ export function useGestureRecognizer({
         videoRef.current.playsInline = true;
         videoRef.current.crossOrigin = "anonymous";
         videoRef.current.srcObject = stream || await navigator.mediaDevices
-            .getUserMedia({
-                audio: false,
-                video: {
-                    width: { ideal: 1920 },
-                    height: { ideal: 1080 },
-                    facingMode: "user",
-                },
-            });
+            .getUserMedia(
+                deepmerge(defaultUserMediaOptions, userMediaOptions || {}),
+            );
         videoRef.current.onloadedmetadata = () => {
             videoRef.current!.play();
         };

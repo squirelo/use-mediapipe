@@ -4,6 +4,7 @@ import { RunningMode } from "./types";
 import canPlayStream from "./canPlayStream";
 import deepmerge from "deepmerge";
 import { tasksVisionVersion, defaultUserMediaOptions } from "./const";
+import canReadVideo from "./canReadVideo";
 
 export { GestureRecognizer, GestureRecognizerOptions, GestureRecognizerResult };
 
@@ -37,7 +38,7 @@ export function useGestureRecognizer({
     async function predictGesture(time: number, stream?: MediaStream, gestureRecognizerOptions: GestureRecognizerOptions = defaultGestureRecognizerOptions) {
         if (!videoRef.current || !gestureRecognizerRef.current) return;
         const currentTime = videoRef.current.currentTime;
-        if (canPlayStream(stream) && currentTime > lastVideoTimeRef.current && videoRef.current.videoWidth > 0 && videoRef.current.videoHeight > 0) {
+        if (canPlayStream(stream) && canReadVideo(videoRef.current) && currentTime > lastVideoTimeRef.current) {
             lastVideoTimeRef.current = currentTime;
             if (gestureRecognizerOptions.runningMode === 'IMAGE') {
                 const results = await gestureRecognizerRef.current?.recognize(videoRef.current);

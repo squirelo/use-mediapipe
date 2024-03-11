@@ -4,6 +4,7 @@ import { RunningMode } from "./types";
 import canPlayStream from "./canPlayStream";
 import deepmerge from "deepmerge";
 import { tasksVisionVersion, defaultUserMediaOptions } from "./const";
+import canReadVideo from "./canReadVideo";
 
 export const defaultFaceDetectorOptions: FaceDetectorOptions = {
     baseOptions: {
@@ -34,7 +35,7 @@ export function useFaceDetector({
     async function predictFaceDetections(time: number, stream?: MediaStream, faceDetectorOptions: FaceDetectorOptions = defaultFaceDetectorOptions) {
         if (!videoRef.current || !faceDetectorRef.current) return;
         const currentTime = videoRef.current.currentTime;
-        if (canPlayStream(stream) && currentTime > lastVideoTimeRef.current && videoRef.current.videoWidth > 0 && videoRef.current.videoHeight > 0) {
+        if (canPlayStream(stream) && canReadVideo(videoRef.current) && currentTime > lastVideoTimeRef.current) {
             lastVideoTimeRef.current = currentTime;
             if (faceDetectorOptions.runningMode === 'IMAGE') {
                 const results = await faceDetectorRef.current?.detect(videoRef.current);

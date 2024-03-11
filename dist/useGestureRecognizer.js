@@ -19,6 +19,7 @@ Object.defineProperty(exports, "GestureRecognizer", { enumerable: true, get: fun
 const canPlayStream_1 = __importDefault(require("./canPlayStream"));
 const deepmerge_1 = __importDefault(require("deepmerge"));
 const const_1 = require("./const");
+const canReadVideo_1 = __importDefault(require("./canReadVideo"));
 exports.defaultGestureRecognizerOptions = {
     baseOptions: {
         modelAssetPath: 'https://storage.googleapis.com/mediapipe-models/gesture_recognizer/gesture_recognizer/float16/1/gesture_recognizer.task',
@@ -46,7 +47,7 @@ function useGestureRecognizer({ onResults, }) {
             if (!videoRef.current || !gestureRecognizerRef.current)
                 return;
             const currentTime = videoRef.current.currentTime;
-            if ((0, canPlayStream_1.default)(stream) && currentTime > lastVideoTimeRef.current && videoRef.current.videoWidth > 0 && videoRef.current.videoHeight > 0) {
+            if ((0, canPlayStream_1.default)(stream) && (0, canReadVideo_1.default)(videoRef.current) && currentTime > lastVideoTimeRef.current) {
                 lastVideoTimeRef.current = currentTime;
                 if (gestureRecognizerOptions.runningMode === 'IMAGE') {
                     const results = yield ((_a = gestureRecognizerRef.current) === null || _a === void 0 ? void 0 : _a.recognize(videoRef.current));

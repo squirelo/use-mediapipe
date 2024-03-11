@@ -19,6 +19,7 @@ const tasks_vision_1 = require("@mediapipe/tasks-vision");
 Object.defineProperty(exports, "HandLandmarker", { enumerable: true, get: function () { return tasks_vision_1.HandLandmarker; } });
 const canPlayStream_1 = __importDefault(require("./canPlayStream"));
 const const_1 = require("./const");
+const canReadVideo_1 = __importDefault(require("./canReadVideo"));
 exports.defaultHandLandmarkerOptions = {
     baseOptions: {
         modelAssetPath: `https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task`,
@@ -49,7 +50,7 @@ function useHandLandmarker({ onResults, }) {
             if (!videoRef.current || !handLandmarkerRef.current)
                 return;
             const currentTime = videoRef.current.currentTime;
-            if ((0, canPlayStream_1.default)(stream) && currentTime > lastVideoTimeRef.current && videoRef.current.videoWidth > 0 && videoRef.current.videoHeight > 0) {
+            if ((0, canPlayStream_1.default)(stream) && (0, canReadVideo_1.default)(videoRef.current) && currentTime > lastVideoTimeRef.current) {
                 lastVideoTimeRef.current = currentTime;
                 if (handLandmarkerOptions.runningMode === 'IMAGE') {
                     const results = yield ((_a = handLandmarkerRef.current) === null || _a === void 0 ? void 0 : _a.detect(videoRef.current));

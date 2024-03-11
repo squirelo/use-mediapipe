@@ -4,6 +4,7 @@ import { HandLandmarker, HandLandmarkerOptions, HandLandmarkerResult, FilesetRes
 import { RunningMode } from "./types";
 import canPlayStream from "./canPlayStream";
 import { tasksVisionVersion, defaultUserMediaOptions } from "./const";
+import canReadVideo from "./canReadVideo";
 
 export { HandLandmarker, HandLandmarkerOptions, HandLandmarkerResult };
 
@@ -40,7 +41,7 @@ export function useHandLandmarker({
     async function predictHandLandmarks(time: number, stream?: MediaStream, handLandmarkerOptions: HandLandmarkerOptions = defaultHandLandmarkerOptions) {
         if (!videoRef.current || !handLandmarkerRef.current) return;
         const currentTime = videoRef.current.currentTime;
-        if (canPlayStream(stream) && currentTime > lastVideoTimeRef.current && videoRef.current.videoWidth > 0 && videoRef.current.videoHeight > 0) {
+        if (canPlayStream(stream) && canReadVideo(videoRef.current) && currentTime > lastVideoTimeRef.current) {
             lastVideoTimeRef.current = currentTime;
             if (handLandmarkerOptions.runningMode === 'IMAGE') {
                 const results = await handLandmarkerRef.current?.detect(videoRef.current);

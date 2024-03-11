@@ -3,8 +3,7 @@ import { FaceDetector, FilesetResolver, FaceDetectorResult, FaceDetectorOptions 
 import { RunningMode } from "./types";
 import canPlayStream from "./canPlayStream";
 import deepmerge from "deepmerge";
-import { defaultUserMediaOptions } from "./utils";
-import { tasksVisionVersion } from "./const";
+import { tasksVisionVersion, defaultUserMediaOptions } from "./const";
 
 export const defaultFaceDetectorOptions: FaceDetectorOptions = {
     baseOptions: {
@@ -41,7 +40,7 @@ export function useFaceDetector({
                 const results = await faceDetectorRef.current?.detect(videoRef.current);
                 onResults?.(results, stream);
             } else {
-                const results = await faceDetectorRef.current?.detectForVideo(videoRef.current, currentTime + 1);
+                const results = await faceDetectorRef.current?.detectForVideo(videoRef.current, time);
                 onResults?.(results, stream);
             }
         }

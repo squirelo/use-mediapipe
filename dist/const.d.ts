@@ -1,2 +1,3 @@
-export declare const tasksVisionVersion = "0.10.3";
+export declare const tasksVisionVersion = "latest";
+export declare const defaultUserMediaOptions: MediaStreamConstraints;
 //# sourceMappingURL=const.d.ts.map

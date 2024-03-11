@@ -18,7 +18,6 @@ const tasks_vision_1 = require("@mediapipe/tasks-vision");
 Object.defineProperty(exports, "GestureRecognizer", { enumerable: true, get: function () { return tasks_vision_1.GestureRecognizer; } });
 const canPlayStream_1 = __importDefault(require("./canPlayStream"));
 const deepmerge_1 = __importDefault(require("deepmerge"));
-const utils_1 = require("./utils");
 const const_1 = require("./const");
 exports.defaultGestureRecognizerOptions = {
     baseOptions: {
@@ -54,7 +53,7 @@ function useGestureRecognizer({ onResults, }) {
                     onResults === null || onResults === void 0 ? void 0 : onResults(results, stream);
                 }
                 else {
-                    const results = yield ((_b = gestureRecognizerRef.current) === null || _b === void 0 ? void 0 : _b.recognizeForVideo(videoRef.current, currentTime + 1));
+                    const results = yield ((_b = gestureRecognizerRef.current) === null || _b === void 0 ? void 0 : _b.recognizeForVideo(videoRef.current, time));
                     onResults === null || onResults === void 0 ? void 0 : onResults(results, stream);
                 }
             }
@@ -71,7 +70,7 @@ function useGestureRecognizer({ onResults, }) {
             videoRef.current.playsInline = true;
             videoRef.current.crossOrigin = "anonymous";
             videoRef.current.srcObject = stream || (yield navigator.mediaDevices
-                .getUserMedia((0, deepmerge_1.default)(utils_1.defaultUserMediaOptions, userMediaOptions || {})));
+                .getUserMedia((0, deepmerge_1.default)(const_1.defaultUserMediaOptions, userMediaOptions || {})));
             videoRef.current.onloadedmetadata = () => {
                 videoRef.current.play();
             };

@@ -3,8 +3,7 @@ import { FilesetResolver, GestureRecognizer, GestureRecognizerOptions, GestureRe
 import { RunningMode } from "./types";
 import canPlayStream from "./canPlayStream";
 import deepmerge from "deepmerge";
-import { defaultUserMediaOptions } from "./utils";
-import { tasksVisionVersion } from "./const";
+import { tasksVisionVersion, defaultUserMediaOptions } from "./const";
 
 export { GestureRecognizer, GestureRecognizerOptions, GestureRecognizerResult };
 
@@ -44,7 +43,7 @@ export function useGestureRecognizer({
                 const results = await gestureRecognizerRef.current?.recognize(videoRef.current);
                 onResults?.(results, stream);
             } else {
-                const results = await gestureRecognizerRef.current?.recognizeForVideo(videoRef.current, currentTime + 1);
+                const results = await gestureRecognizerRef.current?.recognizeForVideo(videoRef.current, time);
                 onResults?.(results, stream);
             }
         }

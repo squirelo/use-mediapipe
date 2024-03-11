@@ -3,8 +3,7 @@ import deepmerge from "deepmerge";
 import { FaceLandmarker, FaceLandmarkerOptions, FaceLandmarkerResult, FilesetResolver } from "@mediapipe/tasks-vision";
 import { RunningMode } from "./types";
 import canPlayStream from "./canPlayStream";
-import { defaultUserMediaOptions } from "./utils";
-import { tasksVisionVersion } from "./const";
+import { tasksVisionVersion, defaultUserMediaOptions } from "./const";
 
 export { FaceLandmarker, FaceLandmarkerOptions, FaceLandmarkerResult };
 
@@ -46,7 +45,7 @@ export function useFaceLandmarker({
                 const results = await faceLandmarkerRef.current?.detect(videoRef.current);
                 onResults?.(results, stream);
             } else {
-                const results = await faceLandmarkerRef.current?.detectForVideo(videoRef.current, currentTime + 1);
+                const results = await faceLandmarkerRef.current?.detectForVideo(videoRef.current, time);
                 onResults?.(results, stream);
             }
         }

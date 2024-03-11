@@ -3,8 +3,7 @@ import deepmerge from "deepmerge";
 import { HandLandmarker, HandLandmarkerOptions, HandLandmarkerResult, FilesetResolver } from "@mediapipe/tasks-vision";
 import { RunningMode } from "./types";
 import canPlayStream from "./canPlayStream";
-import { defaultUserMediaOptions } from "./utils";
-import { tasksVisionVersion } from "./const";
+import { tasksVisionVersion, defaultUserMediaOptions } from "./const";
 
 export { HandLandmarker, HandLandmarkerOptions, HandLandmarkerResult };
 
@@ -47,7 +46,7 @@ export function useHandLandmarker({
                 const results = await handLandmarkerRef.current?.detect(videoRef.current);
                 onResults?.(results, stream);
             } else {
-                const results = await handLandmarkerRef.current?.detectForVideo(videoRef.current, currentTime + 1);
+                const results = await handLandmarkerRef.current?.detectForVideo(videoRef.current, time);
                 onResults?.(results, stream);
             }
         }

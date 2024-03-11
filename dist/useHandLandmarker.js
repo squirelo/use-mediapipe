@@ -18,7 +18,6 @@ const deepmerge_1 = __importDefault(require("deepmerge"));
 const tasks_vision_1 = require("@mediapipe/tasks-vision");
 Object.defineProperty(exports, "HandLandmarker", { enumerable: true, get: function () { return tasks_vision_1.HandLandmarker; } });
 const canPlayStream_1 = __importDefault(require("./canPlayStream"));
-const utils_1 = require("./utils");
 const const_1 = require("./const");
 exports.defaultHandLandmarkerOptions = {
     baseOptions: {
@@ -57,7 +56,7 @@ function useHandLandmarker({ onResults, }) {
                     onResults === null || onResults === void 0 ? void 0 : onResults(results, stream);
                 }
                 else {
-                    const results = yield ((_b = handLandmarkerRef.current) === null || _b === void 0 ? void 0 : _b.detectForVideo(videoRef.current, currentTime + 1));
+                    const results = yield ((_b = handLandmarkerRef.current) === null || _b === void 0 ? void 0 : _b.detectForVideo(videoRef.current, time));
                     onResults === null || onResults === void 0 ? void 0 : onResults(results, stream);
                 }
             }
@@ -77,7 +76,7 @@ function useHandLandmarker({ onResults, }) {
             videoRef.current.playsInline = true;
             videoRef.current.crossOrigin = "anonymous";
             videoRef.current.srcObject = stream || (yield navigator.mediaDevices
-                .getUserMedia((0, deepmerge_1.default)(utils_1.defaultUserMediaOptions, userMediaOptions || {})));
+                .getUserMedia((0, deepmerge_1.default)(const_1.defaultUserMediaOptions, userMediaOptions || {})));
             videoRef.current.onloadedmetadata = () => {
                 videoRef.current.play();
             };

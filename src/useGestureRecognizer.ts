@@ -43,7 +43,7 @@ export function useGestureRecognizer({
                 const results = await gestureRecognizerRef.current?.recognize(videoRef.current);
                 onResults?.(results, stream);
             } else {
-                const results = await gestureRecognizerRef.current?.recognizeForVideo(videoRef.current, currentTime);
+                const results = await gestureRecognizerRef.current?.recognizeForVideo(videoRef.current, currentTime + 1);
                 onResults?.(results, stream);
             }
         }

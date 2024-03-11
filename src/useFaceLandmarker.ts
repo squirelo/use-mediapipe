@@ -45,7 +45,7 @@ export function useFaceLandmarker({
                 const results = await faceLandmarkerRef.current?.detect(videoRef.current);
                 onResults?.(results, stream);
             } else {
-                const results = await faceLandmarkerRef.current?.detectForVideo(videoRef.current, currentTime);
+                const results = await faceLandmarkerRef.current?.detectForVideo(videoRef.current, currentTime + 1);
                 onResults?.(results, stream);
             }
         }

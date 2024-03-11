@@ -40,7 +40,7 @@ export function useFaceDetector({
                 const results = await faceDetectorRef.current?.detect(videoRef.current);
                 onResults?.(results, stream);
             } else {
-                const results = await faceDetectorRef.current?.detectForVideo(videoRef.current, currentTime);
+                const results = await faceDetectorRef.current?.detectForVideo(videoRef.current, currentTime + 1);
                 onResults?.(results, stream);
             }
         }

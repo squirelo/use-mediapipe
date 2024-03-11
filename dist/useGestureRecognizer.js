@@ -19,6 +19,7 @@ Object.defineProperty(exports, "GestureRecognizer", { enumerable: true, get: fun
 const canPlayStream_1 = __importDefault(require("./canPlayStream"));
 const deepmerge_1 = __importDefault(require("deepmerge"));
 const utils_1 = require("./utils");
+const const_1 = require("./const");
 exports.defaultGestureRecognizerOptions = {
     baseOptions: {
         modelAssetPath: 'https://storage.googleapis.com/mediapipe-models/gesture_recognizer/gesture_recognizer/float16/1/gesture_recognizer.task',
@@ -29,7 +30,7 @@ exports.defaultGestureRecognizerOptions = {
 };
 function getGestureRecognizer() {
     return __awaiter(this, arguments, void 0, function* (options = {}) {
-        const tasksVision = yield tasks_vision_1.FilesetResolver.forVisionTasks("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm");
+        const tasksVision = yield tasks_vision_1.FilesetResolver.forVisionTasks(`https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@${const_1.tasksVisionVersion}/wasm`);
         const gestureRecognizerOptions = (0, deepmerge_1.default)(exports.defaultGestureRecognizerOptions, options);
         const gestureRecognizer = yield tasks_vision_1.GestureRecognizer.createFromOptions(tasksVision, gestureRecognizerOptions);
         return gestureRecognizer;

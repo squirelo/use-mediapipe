@@ -18,6 +18,7 @@ const tasks_vision_1 = require("@mediapipe/tasks-vision");
 const canPlayStream_1 = __importDefault(require("./canPlayStream"));
 const deepmerge_1 = __importDefault(require("deepmerge"));
 const utils_1 = require("./utils");
+const const_1 = require("./const");
 exports.defaultFaceDetectorOptions = {
     baseOptions: {
         modelAssetPath: `https://storage.googleapis.com/mediapipe-models/face_detector/blaze_face_short_range/float16/1/blaze_face_short_range.tflite`,
@@ -27,7 +28,7 @@ exports.defaultFaceDetectorOptions = {
 };
 function getFaceDetector() {
     return __awaiter(this, arguments, void 0, function* (options = exports.defaultFaceDetectorOptions) {
-        const vision = yield tasks_vision_1.FilesetResolver.forVisionTasks("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm");
+        const vision = yield tasks_vision_1.FilesetResolver.forVisionTasks(`https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@${const_1.tasksVisionVersion}/wasm`);
         const faceDetectorOptions = (0, deepmerge_1.default)(exports.defaultFaceDetectorOptions, options);
         const faceDetector = yield tasks_vision_1.FaceDetector.createFromOptions(vision, faceDetectorOptions);
         return faceDetector;

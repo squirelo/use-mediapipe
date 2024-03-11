@@ -19,6 +19,7 @@ const tasks_vision_1 = require("@mediapipe/tasks-vision");
 Object.defineProperty(exports, "HandLandmarker", { enumerable: true, get: function () { return tasks_vision_1.HandLandmarker; } });
 const canPlayStream_1 = __importDefault(require("./canPlayStream"));
 const utils_1 = require("./utils");
+const const_1 = require("./const");
 exports.defaultHandLandmarkerOptions = {
     baseOptions: {
         modelAssetPath: `https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task`,
@@ -32,7 +33,7 @@ exports.defaultHandLandmarkerOptions = {
 };
 function getHandLandmarker() {
     return __awaiter(this, arguments, void 0, function* (options = {}) {
-        const vision = yield tasks_vision_1.FilesetResolver.forVisionTasks("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm");
+        const vision = yield tasks_vision_1.FilesetResolver.forVisionTasks(`https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@${const_1.tasksVisionVersion}/wasm`);
         const handLandmarkerOptions = (0, deepmerge_1.default)(exports.defaultHandLandmarkerOptions, options);
         const handLandmarker = yield tasks_vision_1.HandLandmarker.createFromOptions(vision, handLandmarkerOptions);
         return handLandmarker;

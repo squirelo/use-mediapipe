@@ -7,12 +7,10 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
-    "patch": "npm version patch",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "pre-push": [
-    "build",
-    "patch"
+    "build"
   ],
   "keywords": [
     "react",

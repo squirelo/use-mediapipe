@@ -19,6 +19,7 @@ const tasks_vision_1 = require("@mediapipe/tasks-vision");
 Object.defineProperty(exports, "FaceLandmarker", { enumerable: true, get: function () { return tasks_vision_1.FaceLandmarker; } });
 const canPlayStream_1 = __importDefault(require("./canPlayStream"));
 const utils_1 = require("./utils");
+const const_1 = require("./const");
 exports.defaultFaceLandmarkerOptions = {
     baseOptions: {
         modelAssetPath: `https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task`,
@@ -31,7 +32,7 @@ exports.defaultFaceLandmarkerOptions = {
 };
 function getFaceLandmarker() {
     return __awaiter(this, arguments, void 0, function* (options = {}) {
-        const vision = yield tasks_vision_1.FilesetResolver.forVisionTasks("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm");
+        const vision = yield tasks_vision_1.FilesetResolver.forVisionTasks(`https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@${const_1.tasksVisionVersion}/wasm`);
         const faceLandmarkerOptions = (0, deepmerge_1.default)(exports.defaultFaceLandmarkerOptions, options);
         const faceLandmarker = yield tasks_vision_1.FaceLandmarker.createFromOptions(vision, faceLandmarkerOptions);
         return faceLandmarker;

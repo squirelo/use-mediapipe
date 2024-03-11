@@ -38,18 +38,24 @@ function useFaceDetector({ onResults, }) {
     const videoRef = react_1.default.useRef(null);
     const faceDetectorRef = react_1.default.useRef();
     const lastVideoTimeRef = react_1.default.useRef(-1);
-    function predictFaceDetections(time, stream) {
-        return __awaiter(this, void 0, void 0, function* () {
-            var _a, _b;
+    function predictFaceDetections(time_1, stream_1) {
+        return __awaiter(this, arguments, void 0, function* (time, stream, faceDetectorOptions = exports.defaultFaceDetectorOptions) {
+            var _a, _b, _c;
             if (!videoRef.current || !faceDetectorRef.current)
                 return;
             const currentTime = videoRef.current.currentTime;
             if ((0, canPlayStream_1.default)(stream) && currentTime > lastVideoTimeRef.current && videoRef.current.videoWidth > 0 && videoRef.current.videoHeight > 0) {
                 lastVideoTimeRef.current = currentTime;
-                const results = yield ((_a = faceDetectorRef.current) === null || _a === void 0 ? void 0 : _a.detectForVideo(videoRef.current, time));
-                onResults === null || onResults === void 0 ? void 0 : onResults(results, stream);
+                if (faceDetectorOptions.runningMode === 'IMAGE') {
+                    const results = yield ((_a = faceDetectorRef.current) === null || _a === void 0 ? void 0 : _a.detect(videoRef.current));
+                    onResults === null || onResults === void 0 ? void 0 : onResults(results, stream);
+                }
+                else {
+                    const results = yield ((_b = faceDetectorRef.current) === null || _b === void 0 ? void 0 : _b.detectForVideo(videoRef.current, currentTime + 1));
+                    onResults === null || onResults === void 0 ? void 0 : onResults(results, stream);
+                }
             }
-            (_b = videoRef.current) === null || _b === void 0 ? void 0 : _b.requestVideoFrameCallback((time) => predictFaceDetections(time, stream));
+            (_c = videoRef.current) === null || _c === void 0 ? void 0 : _c.requestVideoFrameCallback((time) => predictFaceDetections(time, stream, faceDetectorOptions));
         });
     }
     function startFaceDetection() {
@@ -69,7 +75,7 @@ function useFaceDetector({ onResults, }) {
                 videoRef.current.play();
             };
             const _stream = videoRef.current.srcObject;
-            videoRef.current.requestVideoFrameCallback((time) => predictFaceDetections(time, _stream));
+            videoRef.current.requestVideoFrameCallback((time) => predictFaceDetections(time, _stream, faceDetectorOptions));
         });
     }
     return startFaceDetection;

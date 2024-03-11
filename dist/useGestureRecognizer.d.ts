@@ -3,7 +3,7 @@ export { GestureRecognizer, GestureRecognizerOptions, GestureRecognizerResult };
 export declare const defaultGestureRecognizerOptions: {
     baseOptions: {
         modelAssetPath: string;
-        delegate: string;
+        delegate: "CPU" | "GPU";
     };
     runningMode: any;
     numHands: number;

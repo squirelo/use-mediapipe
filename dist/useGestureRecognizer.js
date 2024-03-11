@@ -40,18 +40,24 @@ function useGestureRecognizer({ onResults, }) {
     const videoRef = react_1.default.useRef(null);
     const gestureRecognizerRef = react_1.default.useRef();
     const lastVideoTimeRef = react_1.default.useRef(-1);
-    function predictGesture(time, stream) {
-        return __awaiter(this, void 0, void 0, function* () {
-            var _a, _b;
+    function predictGesture(time_1, stream_1) {
+        return __awaiter(this, arguments, void 0, function* (time, stream, gestureRecognizerOptions = exports.defaultGestureRecognizerOptions) {
+            var _a, _b, _c;
             if (!videoRef.current || !gestureRecognizerRef.current)
                 return;
             const currentTime = videoRef.current.currentTime;
             if ((0, canPlayStream_1.default)(stream) && currentTime > lastVideoTimeRef.current && videoRef.current.videoWidth > 0 && videoRef.current.videoHeight > 0) {
                 lastVideoTimeRef.current = currentTime;
-                const results = yield ((_a = gestureRecognizerRef.current) === null || _a === void 0 ? void 0 : _a.recognizeForVideo(videoRef.current, time));
-                onResults === null || onResults === void 0 ? void 0 : onResults(results, stream);
+                if (gestureRecognizerOptions.runningMode === 'IMAGE') {
+                    const results = yield ((_a = gestureRecognizerRef.current) === null || _a === void 0 ? void 0 : _a.recognize(videoRef.current));
+                    onResults === null || onResults === void 0 ? void 0 : onResults(results, stream);
+                }
+                else {
+                    const results = yield ((_b = gestureRecognizerRef.current) === null || _b === void 0 ? void 0 : _b.recognizeForVideo(videoRef.current, currentTime + 1));
+                    onResults === null || onResults === void 0 ? void 0 : onResults(results, stream);
+                }
             }
-            (_b = videoRef.current) === null || _b === void 0 ? void 0 : _b.requestVideoFrameCallback((time) => predictGesture(time, stream));
+            (_c = videoRef.current) === null || _c === void 0 ? void 0 : _c.requestVideoFrameCallback((time) => predictGesture(time, stream, gestureRecognizerOptions));
         });
     }
     function startGestureTracking() {
@@ -69,7 +75,7 @@ function useGestureRecognizer({ onResults, }) {
                 videoRef.current.play();
             };
             const _stream = videoRef.current.srcObject;
-            videoRef.current.requestVideoFrameCallback((time) => predictGesture(time, _stream));
+            videoRef.current.requestVideoFrameCallback((time) => predictGesture(time, _stream, gestureRecognizerOptions));
         });
     }
     return startGestureTracking;

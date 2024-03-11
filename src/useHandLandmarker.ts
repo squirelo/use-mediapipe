@@ -36,18 +36,15 @@ export function useHandLandmarker({
 }) {
     const videoRef = React.useRef<HTMLVideoElement | null>(null);
     const handLandmarkerRef = React.useRef<HandLandmarker>();
-    const lastVideoTimeRef = React.useRef<number>(-1);
 
     async function predictHandLandmarks(time: number, stream?: MediaStream, handLandmarkerOptions: HandLandmarkerOptions = defaultHandLandmarkerOptions) {
-        if (!videoRef.current || !handLandmarkerRef.current) return;
-        const currentTime = videoRef.current.currentTime;
-        if (canPlayStream(stream) && canReadVideo(videoRef.current) && currentTime > lastVideoTimeRef.current) {
-            lastVideoTimeRef.current = currentTime;
+        if (canPlayStream(stream) && canReadVideo(videoRef.current) && handLandmarkerRef.current) {
+            const video = videoRef.current as HTMLVideoElement;
             if (handLandmarkerOptions.runningMode === 'IMAGE') {
-                const results = await handLandmarkerRef.current?.detect(videoRef.current);
+                const results = await handLandmarkerRef.current?.detect(video);
                 onResults?.(results, stream);
             } else {
-                const results = await handLandmarkerRef.current?.detectForVideo(videoRef.current, time);
+                const results = await handLandmarkerRef.current?.detectForVideo(video, time);
                 onResults?.(results, stream);
             }
         }

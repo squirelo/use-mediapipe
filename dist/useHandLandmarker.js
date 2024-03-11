@@ -43,21 +43,17 @@ exports.getHandLandmarker = getHandLandmarker;
 function useHandLandmarker({ onResults, }) {
     const videoRef = react_1.default.useRef(null);
     const handLandmarkerRef = react_1.default.useRef();
-    const lastVideoTimeRef = react_1.default.useRef(-1);
     function predictHandLandmarks(time_1, stream_1) {
         return __awaiter(this, arguments, void 0, function* (time, stream, handLandmarkerOptions = exports.defaultHandLandmarkerOptions) {
             var _a, _b, _c;
-            if (!videoRef.current || !handLandmarkerRef.current)
-                return;
-            const currentTime = videoRef.current.currentTime;
-            if ((0, canPlayStream_1.default)(stream) && (0, canReadVideo_1.default)(videoRef.current) && currentTime > lastVideoTimeRef.current) {
-                lastVideoTimeRef.current = currentTime;
+            if ((0, canPlayStream_1.default)(stream) && (0, canReadVideo_1.default)(videoRef.current) && handLandmarkerRef.current) {
+                const video = videoRef.current;
                 if (handLandmarkerOptions.runningMode === 'IMAGE') {
-                    const results = yield ((_a = handLandmarkerRef.current) === null || _a === void 0 ? void 0 : _a.detect(videoRef.current));
+                    const results = yield ((_a = handLandmarkerRef.current) === null || _a === void 0 ? void 0 : _a.detect(video));
                     onResults === null || onResults === void 0 ? void 0 : onResults(results, stream);
                 }
                 else {
-                    const results = yield ((_b = handLandmarkerRef.current) === null || _b === void 0 ? void 0 : _b.detectForVideo(videoRef.current, time));
+                    const results = yield ((_b = handLandmarkerRef.current) === null || _b === void 0 ? void 0 : _b.detectForVideo(video, time));
                     onResults === null || onResults === void 0 ? void 0 : onResults(results, stream);
                 }
             }

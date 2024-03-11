@@ -29,22 +29,19 @@ export async function getGestureRecognizer(options: GestureRecognizerOptions = {
 export function useGestureRecognizer({
     onResults,
 }: {
-    onResults: (result?: GestureRecognizerResult, stream?: MediaStream) => void;
+    onResults: (result: GestureRecognizerResult, stream?: MediaStream) => void;
 }) {
     const videoRef = React.useRef<HTMLVideoElement | null>(null);
     const gestureRecognizerRef = React.useRef<GestureRecognizer>();
-    const lastVideoTimeRef = React.useRef<number>(-1);
 
     async function predictGesture(time: number, stream?: MediaStream, gestureRecognizerOptions: GestureRecognizerOptions = defaultGestureRecognizerOptions) {
-        if (!videoRef.current || !gestureRecognizerRef.current) return;
-        const currentTime = videoRef.current.currentTime;
-        if (canPlayStream(stream) && canReadVideo(videoRef.current) && currentTime > lastVideoTimeRef.current) {
-            lastVideoTimeRef.current = currentTime;
+        if (canPlayStream(stream) && canReadVideo(videoRef.current) && gestureRecognizerRef.current) {
+            const video = videoRef.current as HTMLVideoElement;
             if (gestureRecognizerOptions.runningMode === 'IMAGE') {
-                const results = await gestureRecognizerRef.current?.recognize(videoRef.current);
+                const results = await gestureRecognizerRef.current?.recognize(video);
                 onResults?.(results, stream);
             } else {
-                const results = await gestureRecognizerRef.current?.recognizeForVideo(videoRef.current, time);
+                const results = await gestureRecognizerRef.current?.recognizeForVideo(video, time);
                 onResults?.(results, stream);
             }
         }

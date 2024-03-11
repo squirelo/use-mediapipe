@@ -35,18 +35,15 @@ export function useFaceLandmarker({
 }) {
     const videoRef = React.useRef<HTMLVideoElement | null>(null);
     const faceLandmarkerRef = React.useRef<FaceLandmarker>();
-    const lastVideoTimeRef = React.useRef<number>(-1);
 
     async function predictFaceLandmarks(time: number, stream?: MediaStream, faceLandmarkerOptions: FaceLandmarkerOptions = defaultFaceLandmarkerOptions) {
-        if (!videoRef.current || !faceLandmarkerRef.current) return;
-        const currentTime = videoRef.current.currentTime;
-        if (canPlayStream(stream) && canReadVideo(videoRef.current) && currentTime > lastVideoTimeRef.current) {
-            lastVideoTimeRef.current = currentTime;
+        if (canPlayStream(stream) && canReadVideo(videoRef.current) && faceLandmarkerRef.current) {
+            const video = videoRef.current as HTMLVideoElement;
             if (faceLandmarkerOptions.runningMode === 'IMAGE') {
-                const results = await faceLandmarkerRef.current?.detect(videoRef.current);
+                const results = await faceLandmarkerRef.current?.detect(video);
                 onResults?.(results, stream);
             } else {
-                const results = await faceLandmarkerRef.current?.detectForVideo(videoRef.current, time);
+                const results = await faceLandmarkerRef.current?.detectForVideo(video, time);
                 onResults?.(results, stream);
             }
         }

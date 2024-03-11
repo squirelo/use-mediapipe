@@ -2,6 +2,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 function canReadVideo(video) {
     const { videoWidth = 0, videoHeight = 0 } = video || {};
-    return videoWidth > 0 && videoHeight > 0;
+    return !!video && videoWidth > 0 && videoHeight > 0;
 }
 exports.default = canReadVideo;

@@ -36,15 +36,20 @@ export function useFaceLandmarker({
     const faceLandmarkerRef = React.useRef<FaceLandmarker>();
     const lastVideoTimeRef = React.useRef<number>(-1);
 
-    async function predictFaceLandmarks(time: number, stream?: MediaStream) {
+    async function predictFaceLandmarks(time: number, stream?: MediaStream, faceLandmarkerOptions: FaceLandmarkerOptions = defaultFaceLandmarkerOptions) {
         if (!videoRef.current || !faceLandmarkerRef.current) return;
         const currentTime = videoRef.current.currentTime;
         if (canPlayStream(stream) && currentTime > lastVideoTimeRef.current && videoRef.current.videoWidth > 0 && videoRef.current.videoHeight > 0) {
             lastVideoTimeRef.current = currentTime;
-            const results = await faceLandmarkerRef.current?.detectForVideo(videoRef.current, time);
-            onResults?.(results, stream);
+            if (faceLandmarkerOptions.runningMode === 'IMAGE') {
+                const results = await faceLandmarkerRef.current?.detect(videoRef.current);
+                onResults?.(results, stream);
+            } else {
+                const results = await faceLandmarkerRef.current?.detectForVideo(videoRef.current, time);
+                onResults?.(results, stream);
+            }
         }
-        videoRef.current?.requestVideoFrameCallback((time) => predictFaceLandmarks(time, stream));
+        videoRef.current?.requestVideoFrameCallback((time) => predictFaceLandmarks(time, stream, faceLandmarkerOptions));
     }
 
     async function startFaceTracking({
@@ -74,7 +79,7 @@ export function useFaceLandmarker({
             videoRef.current!.play();
         };
         const _stream = videoRef.current.srcObject as MediaStream;
-        videoRef.current.requestVideoFrameCallback((time) => predictFaceLandmarks(time, _stream));
+        videoRef.current.requestVideoFrameCallback((time) => predictFaceLandmarks(time, _stream, faceLandmarkerOptions));
 
     }
 

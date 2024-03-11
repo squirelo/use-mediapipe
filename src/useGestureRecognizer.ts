@@ -4,6 +4,7 @@ import { RunningMode } from "./types";
 import canPlayStream from "./canPlayStream";
 import deepmerge from "deepmerge";
 import { defaultUserMediaOptions } from "./utils";
+import { tasksVisionVersion } from "./const";
 
 export { GestureRecognizer, GestureRecognizerOptions, GestureRecognizerResult };
 
@@ -18,7 +19,7 @@ export const defaultGestureRecognizerOptions = {
 
 export async function getGestureRecognizer(options: GestureRecognizerOptions = {}): Promise<GestureRecognizer> {
     const tasksVision = await FilesetResolver.forVisionTasks(
-        "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm"
+        `https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@${tasksVisionVersion}/wasm`
     );
     const gestureRecognizerOptions: GestureRecognizerOptions = deepmerge(defaultGestureRecognizerOptions, options);
     const gestureRecognizer = await GestureRecognizer.createFromOptions(tasksVision, gestureRecognizerOptions);

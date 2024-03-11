@@ -4,6 +4,7 @@ import { HandLandmarker, HandLandmarkerOptions, HandLandmarkerResult, FilesetRes
 import { RunningMode } from "./types";
 import canPlayStream from "./canPlayStream";
 import { defaultUserMediaOptions } from "./utils";
+import { tasksVisionVersion } from "./const";
 
 export { HandLandmarker, HandLandmarkerOptions, HandLandmarkerResult };
 
@@ -21,7 +22,7 @@ export const defaultHandLandmarkerOptions: HandLandmarkerOptions = {
 
 export async function getHandLandmarker(options: HandLandmarkerOptions = {}) {
     const vision = await FilesetResolver.forVisionTasks(
-        "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm"
+        `https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@${tasksVisionVersion}/wasm`
     );
     const handLandmarkerOptions: HandLandmarkerOptions = deepmerge(defaultHandLandmarkerOptions, options);
     const handLandmarker = await HandLandmarker.createFromOptions(vision, handLandmarkerOptions);

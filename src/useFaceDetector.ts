@@ -4,6 +4,7 @@ import { RunningMode } from "./types";
 import canPlayStream from "./canPlayStream";
 import deepmerge from "deepmerge";
 import { defaultUserMediaOptions } from "./utils";
+import { tasksVisionVersion } from "./const";
 
 export const defaultFaceDetectorOptions: FaceDetectorOptions = {
     baseOptions: {
@@ -15,7 +16,7 @@ export const defaultFaceDetectorOptions: FaceDetectorOptions = {
 
 export async function getFaceDetector(options: FaceDetectorOptions = defaultFaceDetectorOptions) {
     const vision = await FilesetResolver.forVisionTasks(
-        "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm"
+        `https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@${tasksVisionVersion}/wasm`
     );
     const faceDetectorOptions = deepmerge(defaultFaceDetectorOptions, options);
     const faceDetector = await FaceDetector.createFromOptions(vision, faceDetectorOptions);

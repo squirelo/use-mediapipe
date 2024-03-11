@@ -4,6 +4,7 @@ import { FaceLandmarker, FaceLandmarkerOptions, FaceLandmarkerResult, FilesetRes
 import { RunningMode } from "./types";
 import canPlayStream from "./canPlayStream";
 import { defaultUserMediaOptions } from "./utils";
+import { tasksVisionVersion } from "./const";
 
 export { FaceLandmarker, FaceLandmarkerOptions, FaceLandmarkerResult };
 
@@ -20,7 +21,7 @@ export const defaultFaceLandmarkerOptions: FaceLandmarkerOptions = {
 
 export async function getFaceLandmarker(options: FaceLandmarkerOptions = {}) {
     const vision = await FilesetResolver.forVisionTasks(
-        "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm"
+        `https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@${tasksVisionVersion}/wasm`
     );
     const faceLandmarkerOptions: FaceLandmarkerOptions = deepmerge(defaultFaceLandmarkerOptions, options);
     const faceLandmarker = await FaceLandmarker.createFromOptions(vision, faceLandmarkerOptions);

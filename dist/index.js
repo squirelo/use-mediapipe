@@ -16,4 +16,5 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
 Object.defineProperty(exports, "__esModule", { value: true });
 __exportStar(require("./useFaceLandmarker"), exports);
 __exportStar(require("./useGestureRecognizer"), exports);
+__exportStar(require("./useFaceDetector"), exports);
 __exportStar(require("./types"), exports);

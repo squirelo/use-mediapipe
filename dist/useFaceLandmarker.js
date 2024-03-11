@@ -14,22 +14,25 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.useFaceLandmarker = exports.getFaceLandmarker = exports.defaultFaceLandmarkerOptions = exports.FaceLandmarker = void 0;
 const react_1 = __importDefault(require("react"));
+const deepmerge_1 = __importDefault(require("deepmerge"));
 const tasks_vision_1 = require("@mediapipe/tasks-vision");
 Object.defineProperty(exports, "FaceLandmarker", { enumerable: true, get: function () { return tasks_vision_1.FaceLandmarker; } });
 const canPlayStream_1 = __importDefault(require("./canPlayStream"));
+const utils_1 = require("./utils");
 exports.defaultFaceLandmarkerOptions = {
+    baseOptions: {
+        modelAssetPath: `https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task`,
+        delegate: "GPU"
+    },
     runningMode: 'VIDEO',
-    numFaces: 10,
+    numFaces: 1,
     outputFaceBlendshapes: true,
     outputFacialTransformationMatrixes: true,
 };
 function getFaceLandmarker() {
     return __awaiter(this, arguments, void 0, function* (options = {}) {
-        const vision = yield tasks_vision_1.FilesetResolver.forVisionTasks("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3/wasm");
-        const faceLandmarkerOptions = Object.assign(Object.assign({ baseOptions: {
-                modelAssetPath: `https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task`,
-                delegate: "GPU"
-            } }, exports.defaultFaceLandmarkerOptions), options);
+        const vision = yield tasks_vision_1.FilesetResolver.forVisionTasks("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm");
+        const faceLandmarkerOptions = (0, deepmerge_1.default)(exports.defaultFaceLandmarkerOptions, options);
         const faceLandmarker = yield tasks_vision_1.FaceLandmarker.createFromOptions(vision, faceLandmarkerOptions);
         return faceLandmarker;
     });
@@ -44,20 +47,20 @@ function useFaceLandmarker({ onResults, }) {
             var _a, _b;
             if (!videoRef.current || !faceLandmarkerRef.current)
                 return;
-            const startTimeMs = performance.now();
             const currentTime = videoRef.current.currentTime;
-            if ((0, canPlayStream_1.default)(stream) && currentTime !== lastVideoTimeRef.current && videoRef.current.videoWidth > 0 && videoRef.current.videoHeight > 0) {
+            if ((0, canPlayStream_1.default)(stream) && currentTime > lastVideoTimeRef.current && videoRef.current.videoWidth > 0 && videoRef.current.videoHeight > 0) {
                 lastVideoTimeRef.current = currentTime;
-                const results = yield ((_a = faceLandmarkerRef.current) === null || _a === void 0 ? void 0 : _a.detectForVideo(videoRef.current, startTimeMs));
+                const results = yield ((_a = faceLandmarkerRef.current) === null || _a === void 0 ? void 0 : _a.detectForVideo(videoRef.current, time));
                 onResults === null || onResults === void 0 ? void 0 : onResults(results, stream);
             }
             (_b = videoRef.current) === null || _b === void 0 ? void 0 : _b.requestVideoFrameCallback((time) => predictFaceLandmarks(time, stream));
         });
     }
     function startFaceTracking() {
-        return __awaiter(this, arguments, void 0, function* ({ stream, faceLandmarkerOptions, } = {
+        return __awaiter(this, arguments, void 0, function* ({ stream, faceLandmarkerOptions, userMediaOptions, } = {
             stream: undefined,
             faceLandmarkerOptions: undefined,
+            userMediaOptions: undefined,
         }) {
             faceLandmarkerRef.current = yield getFaceLandmarker(faceLandmarkerOptions);
             videoRef.current = document.createElement("video");
@@ -66,14 +69,7 @@ function useFaceLandmarker({ onResults, }) {
             videoRef.current.playsInline = true;
             videoRef.current.crossOrigin = "anonymous";
             videoRef.current.srcObject = stream || (yield navigator.mediaDevices
-                .getUserMedia({
-                audio: false,
-                video: {
-                    width: { ideal: 1920 },
-                    height: { ideal: 1080 },
-                    facingMode: "user",
-                },
-            }));
+                .getUserMedia((0, deepmerge_1.default)(utils_1.defaultUserMediaOptions, userMediaOptions || {})));
             videoRef.current.onloadedmetadata = () => {
                 videoRef.current.play();
             };

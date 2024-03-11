@@ -52,7 +52,7 @@ export function useFaceLandmarker({
         videoRef.current?.requestVideoFrameCallback((time) => predictFaceLandmarks(time, stream, faceLandmarkerOptions));
     }
 
-    async function startFaceTracking({
+    async function startFaceLandmarker({
         stream,
         faceLandmarkerOptions,
         userMediaOptions,
@@ -83,6 +83,6 @@ export function useFaceLandmarker({
 
     }
 
-    return startFaceTracking;
+    return startFaceLandmarker;
 
 }

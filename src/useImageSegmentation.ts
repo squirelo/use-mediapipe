@@ -7,6 +7,8 @@ import { tasksVisionVersion, defaultUserMediaOptions } from "./const";
 import canReadVideo from "./canReadVideo";
 import stopVideo from "./stopVideo";
 
+export { ImageSegmenter, ImageSegmenterOptions, ImageSegmenterResult };
+
 export const defaultImageSegmenterOptions: ImageSegmenterOptions = {
     baseOptions: {
         modelAssetPath: "https://storage.googleapis.com/mediapipe-assets/deeplabv3.tflite?generation=1661875711618421",

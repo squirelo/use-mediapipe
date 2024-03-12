@@ -12,10 +12,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.useImageSegmenter = exports.getImageSegmenter = exports.defaultImageSegmenterOptions = void 0;
+exports.useImageSegmenter = exports.getImageSegmenter = exports.defaultImageSegmenterOptions = exports.ImageSegmenterResult = exports.ImageSegmenter = void 0;
 const react_1 = __importDefault(require("react"));
 const deepmerge_1 = __importDefault(require("deepmerge"));
 const tasks_vision_1 = require("@mediapipe/tasks-vision");
+Object.defineProperty(exports, "ImageSegmenter", { enumerable: true, get: function () { return tasks_vision_1.ImageSegmenter; } });
+Object.defineProperty(exports, "ImageSegmenterResult", { enumerable: true, get: function () { return tasks_vision_1.ImageSegmenterResult; } });
 const canPlayStream_1 = __importDefault(require("./canPlayStream"));
 const const_1 = require("./const");
 const canReadVideo_1 = __importDefault(require("./canReadVideo"));

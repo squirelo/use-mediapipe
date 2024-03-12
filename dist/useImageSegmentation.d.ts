@@ -1,4 +1,5 @@
 import { ImageSegmenter, ImageSegmenterOptions, ImageSegmenterResult } from "@mediapipe/tasks-vision";
+export { ImageSegmenter, ImageSegmenterOptions, ImageSegmenterResult };
 export declare const defaultImageSegmenterOptions: ImageSegmenterOptions;
 export declare function getImageSegmenter(options?: ImageSegmenterOptions): Promise<ImageSegmenter>;
 export declare function useImageSegmenter({ onResults, }: {

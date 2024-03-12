@@ -45,7 +45,7 @@ function useImageSegmenter({ onResults, }) {
     const isImageSegmenterRunningRef = react_1.default.useRef(false);
     function predictImageSegmentations(time_1, stream_1) {
         return __awaiter(this, arguments, void 0, function* (time, stream, imageSegmenterOptions = exports.defaultImageSegmenterOptions) {
-            var _a, _b, _c;
+            var _a, _b;
             if (!isImageSegmenterRunningRef.current)
                 return;
             if ((0, canPlayStream_1.default)(stream) && (0, canReadVideo_1.default)(videoRef.current) && imageSegmenterRef.current) {
@@ -54,11 +54,12 @@ function useImageSegmenter({ onResults, }) {
                     (_a = imageSegmenterRef.current) === null || _a === void 0 ? void 0 : _a.segment(video, (results) => onResults(results, stream));
                 }
                 else {
-                    (_b = imageSegmenterRef.current) === null || _b === void 0 ? void 0 : _b.segmentForVideo(video, time, (results) => onResults(results, stream));
+                    (_b = imageSegmenterRef.current) === null || _b === void 0 ? void 0 : _b.segmentForVideo(video, time, (results) => {
+                        var _a;
+                        onResults(results, stream);
+                        (_a = videoRef.current) === null || _a === void 0 ? void 0 : _a.requestVideoFrameCallback((time) => predictImageSegmentations(time, stream, imageSegmenterOptions));
+                    });
                 }
-            }
-            if (videoRef.current && imageSegmenterOptions.runningMode === 'VIDEO') {
-                (_c = videoRef.current) === null || _c === void 0 ? void 0 : _c.requestVideoFrameCallback((time) => predictImageSegmentations(time, stream, imageSegmenterOptions));
             }
         });
     }

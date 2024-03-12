@@ -43,11 +43,11 @@ export function useImageSegmenter({
             if (imageSegmenterOptions.runningMode === 'IMAGE') {
                 imageSegmenterRef.current?.segment(video, (results) => onResults(results, stream));
             } else {
-                imageSegmenterRef.current?.segmentForVideo(video, time, (results) => onResults(results, stream));
+                imageSegmenterRef.current?.segmentForVideo(video, time, (results) => {
+                    onResults(results, stream);
+                    videoRef.current?.requestVideoFrameCallback((time) => predictImageSegmentations(time, stream, imageSegmenterOptions));
+                });
             }
-        }
-        if (videoRef.current && imageSegmenterOptions.runningMode === 'VIDEO') {
-            videoRef.current?.requestVideoFrameCallback((time) => predictImageSegmentations(time, stream, imageSegmenterOptions));
         }
     }
 

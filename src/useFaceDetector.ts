@@ -35,21 +35,14 @@ export function useFaceDetector({
     const faceDetectorRef = React.useRef<FaceDetector>();
     const isFaceDetectionRunningRef = React.useRef<boolean>(false);
 
-    async function predictFaceDetections(time: number, stream?: MediaStream, faceDetectorOptions: FaceDetectorOptions = defaultFaceDetectorOptions) {
+    async function predictFaceDetections(time: number, stream?: MediaStream) {
         if (!isFaceDetectionRunningRef.current) return;
         if (canPlayStream(stream) && canReadVideo(videoRef.current) && faceDetectorRef.current) {
             const video = videoRef.current as HTMLVideoElement;
-            if (faceDetectorOptions.runningMode === 'IMAGE') {
-                const results = await faceDetectorRef.current?.detect(video);
-                onResults?.(results, stream);
-            } else {
-                const results = await faceDetectorRef.current?.detectForVideo(video, time);
-                onResults?.(results, stream);
-            }
+            const results = await faceDetectorRef.current?.detectForVideo(video, time);
+            onResults?.(results, stream);
         }
-        if (videoRef.current && faceDetectorOptions.runningMode === 'VIDEO') {
-            videoRef.current?.requestVideoFrameCallback((time) => predictFaceDetections(time, stream, faceDetectorOptions));
-        }
+        videoRef.current?.requestVideoFrameCallback((time) => predictFaceDetections(time, stream));
     }
 
     async function startFaceDetection({
@@ -79,7 +72,7 @@ export function useFaceDetector({
             videoRef.current!.play();
         };
         const _stream = videoRef.current.srcObject as MediaStream;
-        videoRef.current.requestVideoFrameCallback((time) => predictFaceDetections(time, _stream, faceDetectorOptions));
+        videoRef.current.requestVideoFrameCallback((time) => predictFaceDetections(time, _stream));
 
     }
 

@@ -43,25 +43,17 @@ function useFaceLandmarker({ onResults, }) {
     const videoRef = react_1.default.useRef(null);
     const faceLandmarkerRef = react_1.default.useRef();
     const isFaceLandmarkerRunningRef = react_1.default.useRef(false);
-    function predictFaceLandmarks(time_1, stream_1) {
-        return __awaiter(this, arguments, void 0, function* (time, stream, faceLandmarkerOptions = exports.defaultFaceLandmarkerOptions) {
-            var _a, _b, _c;
+    function predictFaceLandmarks(time, stream) {
+        return __awaiter(this, void 0, void 0, function* () {
+            var _a, _b;
             if (!isFaceLandmarkerRunningRef.current)
                 return;
             if ((0, canPlayStream_1.default)(stream) && (0, canReadVideo_1.default)(videoRef.current) && faceLandmarkerRef.current) {
                 const video = videoRef.current;
-                if (faceLandmarkerOptions.runningMode === 'IMAGE') {
-                    const results = yield ((_a = faceLandmarkerRef.current) === null || _a === void 0 ? void 0 : _a.detect(video));
-                    onResults === null || onResults === void 0 ? void 0 : onResults(results, stream);
-                }
-                else {
-                    const results = yield ((_b = faceLandmarkerRef.current) === null || _b === void 0 ? void 0 : _b.detectForVideo(video, time));
-                    onResults === null || onResults === void 0 ? void 0 : onResults(results, stream);
-                }
+                const results = yield ((_a = faceLandmarkerRef.current) === null || _a === void 0 ? void 0 : _a.detectForVideo(video, time));
+                onResults === null || onResults === void 0 ? void 0 : onResults(results, stream);
             }
-            if (videoRef.current && faceLandmarkerOptions.runningMode === 'VIDEO') {
-                (_c = videoRef.current) === null || _c === void 0 ? void 0 : _c.requestVideoFrameCallback((time) => predictFaceLandmarks(time, stream, faceLandmarkerOptions));
-            }
+            (_b = videoRef.current) === null || _b === void 0 ? void 0 : _b.requestVideoFrameCallback((time) => predictFaceLandmarks(time, stream));
         });
     }
     function startFaceLandmarker() {
@@ -83,7 +75,7 @@ function useFaceLandmarker({ onResults, }) {
                 videoRef.current.play();
             };
             const _stream = videoRef.current.srcObject;
-            videoRef.current.requestVideoFrameCallback((time) => predictFaceLandmarks(time, _stream, faceLandmarkerOptions));
+            videoRef.current.requestVideoFrameCallback((time) => predictFaceLandmarks(time, _stream));
         });
     }
     function stopFaceLandmarker() {

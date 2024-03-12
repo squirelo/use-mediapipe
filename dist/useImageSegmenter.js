@@ -41,23 +41,18 @@ function useImageSegmenter({ onResults, }) {
     const videoRef = react_1.default.useRef(null);
     const imageSegmenterRef = react_1.default.useRef();
     const isImageSegmenterRunningRef = react_1.default.useRef(false);
-    function predictImageSegmentations(time_1, stream_1) {
-        return __awaiter(this, arguments, void 0, function* (time, stream, imageSegmenterOptions = exports.defaultImageSegmenterOptions) {
-            var _a, _b;
+    function predictImageSegmentations(time, stream) {
+        return __awaiter(this, void 0, void 0, function* () {
+            var _a;
             if (!isImageSegmenterRunningRef.current)
                 return;
             if ((0, canPlayStream_1.default)(stream) && (0, canReadVideo_1.default)(videoRef.current) && imageSegmenterRef.current) {
                 const video = videoRef.current;
-                if (imageSegmenterOptions.runningMode === 'IMAGE') {
-                    (_a = imageSegmenterRef.current) === null || _a === void 0 ? void 0 : _a.segment(video, (results) => onResults(results, stream));
-                }
-                else {
-                    (_b = imageSegmenterRef.current) === null || _b === void 0 ? void 0 : _b.segmentForVideo(video, time, (results) => {
-                        var _a;
-                        onResults(results, stream);
-                        (_a = videoRef.current) === null || _a === void 0 ? void 0 : _a.requestVideoFrameCallback((time) => predictImageSegmentations(time, stream, imageSegmenterOptions));
-                    });
-                }
+                (_a = imageSegmenterRef.current) === null || _a === void 0 ? void 0 : _a.segmentForVideo(video, time, (results) => {
+                    var _a;
+                    onResults(results, stream);
+                    (_a = videoRef.current) === null || _a === void 0 ? void 0 : _a.requestVideoFrameCallback((time) => predictImageSegmentations(time, stream));
+                });
             }
         });
     }
@@ -80,7 +75,7 @@ function useImageSegmenter({ onResults, }) {
                 videoRef.current.play();
             };
             const _stream = videoRef.current.srcObject;
-            videoRef.current.requestVideoFrameCallback((time) => predictImageSegmentations(time, _stream, imageSegmenterOptions));
+            videoRef.current.requestVideoFrameCallback((time) => predictImageSegmentations(time, _stream));
         });
     }
     function stopImageSegmenter() {

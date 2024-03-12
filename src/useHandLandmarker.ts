@@ -39,21 +39,14 @@ export function useHandLandmarker({
     const handLandmarkerRef = React.useRef<HandLandmarker>();
     const ishHandLandmarkerRunningRef = React.useRef<boolean>(false);
 
-    async function predictHandLandmarks(time: number, stream?: MediaStream, handLandmarkerOptions: HandLandmarkerOptions = defaultHandLandmarkerOptions) {
+    async function predictHandLandmarks(time: number, stream?: MediaStream) {
         if (!ishHandLandmarkerRunningRef.current) return;
         if (canPlayStream(stream) && canReadVideo(videoRef.current) && handLandmarkerRef.current) {
             const video = videoRef.current as HTMLVideoElement;
-            if (handLandmarkerOptions.runningMode === 'IMAGE') {
-                const results = await handLandmarkerRef.current?.detect(video);
-                onResults?.(results, stream);
-            } else {
-                const results = await handLandmarkerRef.current?.detectForVideo(video, time);
-                onResults?.(results, stream);
-            }
+            const results = await handLandmarkerRef.current?.detectForVideo(video, time);
+            onResults?.(results, stream);
         }
-        if (videoRef.current && handLandmarkerOptions.runningMode === 'VIDEO') {
-            videoRef.current?.requestVideoFrameCallback((time) => predictHandLandmarks(time, stream, handLandmarkerOptions));
-        }
+        videoRef.current?.requestVideoFrameCallback((time) => predictHandLandmarks(time, stream));
     }
 
     async function startHandLandmarker({
@@ -84,7 +77,7 @@ export function useHandLandmarker({
             videoRef.current!.play();
         };
         const _stream = videoRef.current.srcObject as MediaStream;
-        videoRef.current.requestVideoFrameCallback((time) => predictHandLandmarks(time, _stream, handLandmarkerOptions));
+        videoRef.current.requestVideoFrameCallback((time) => predictHandLandmarks(time, _stream));
 
     }
 

@@ -36,18 +36,14 @@ export function useImageSegmenter({
     const imageSegmenterRef = React.useRef<ImageSegmenter>();
     const isImageSegmenterRunningRef = React.useRef<boolean>(false);
 
-    async function predictImageSegmentations(time: number, stream?: MediaStream, imageSegmenterOptions: ImageSegmenterOptions = defaultImageSegmenterOptions) {
+    async function predictImageSegmentations(time: number, stream?: MediaStream) {
         if (!isImageSegmenterRunningRef.current) return;
         if (canPlayStream(stream) && canReadVideo(videoRef.current) && imageSegmenterRef.current) {
             const video = videoRef.current as HTMLVideoElement;
-            if (imageSegmenterOptions.runningMode === 'IMAGE') {
-                imageSegmenterRef.current?.segment(video, (results) => onResults(results, stream));
-            } else {
-                imageSegmenterRef.current?.segmentForVideo(video, time, (results) => {
-                    onResults(results, stream);
-                    videoRef.current?.requestVideoFrameCallback((time) => predictImageSegmentations(time, stream, imageSegmenterOptions));
-                });
-            }
+            imageSegmenterRef.current?.segmentForVideo(video, time, (results) => {
+                onResults(results, stream);
+                videoRef.current?.requestVideoFrameCallback((time) => predictImageSegmentations(time, stream));
+            });
         }
     }
 
@@ -79,7 +75,7 @@ export function useImageSegmenter({
             videoRef.current!.play();
         };
         const _stream = videoRef.current.srcObject as MediaStream;
-        videoRef.current.requestVideoFrameCallback((time) => predictImageSegmentations(time, _stream, imageSegmenterOptions));
+        videoRef.current.requestVideoFrameCallback((time) => predictImageSegmentations(time, _stream));
 
     }
 

@@ -18,7 +18,8 @@ function getSelfieSegmenter(options: SelfieSegmentationOptions = defaultSelfieSe
         locateFile: (file) =>
             `https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/${file}`,
     });
-    selfieSegmentation.setOptions(deepmerge(defaultSelfieSegmentationOptions, options));
+    const selfieSegmenterOptions = deepmerge(defaultSelfieSegmentationOptions, options);
+    selfieSegmentation.setOptions(selfieSegmenterOptions);
     return selfieSegmentation;
 }
 
@@ -32,11 +33,11 @@ export function useSelfieSegmenter({
     const selfieSegmentationRef = React.useRef<SelfieSegmentation>();
     const isSelfieSegmentationRunningRef = React.useRef<boolean>(false);
 
-    async function predictSelfieSegmentation(time: number, stream?: MediaStream, selfieSegmentationOptions: SelfieSegmentationOptions = defaultSelfieSegmentationOptions) {
+    async function predictSelfieSegmentation(time: number, stream?: MediaStream) {
         if (!isSelfieSegmentationRunningRef.current) return;
         if (canPlayStream(stream) && canReadVideo(videoRef.current) && selfieSegmentationRef.current) {
             await selfieSegmentationRef.current?.send({ image: videoRef.current as InputImage });
-            videoRef.current?.requestVideoFrameCallback((time) => predictSelfieSegmentation(time, stream, selfieSegmentationOptions));
+            videoRef.current?.requestVideoFrameCallback((time) => predictSelfieSegmentation(time, stream));
         }
     }
 
@@ -69,7 +70,7 @@ export function useSelfieSegmenter({
             videoRef.current!.play();
         };
         const _stream = videoRef.current.srcObject as MediaStream;
-        videoRef.current.requestVideoFrameCallback((time) => predictSelfieSegmentation(time, _stream, selfieSegmentationOptions));
+        videoRef.current.requestVideoFrameCallback((time) => predictSelfieSegmentation(time, _stream));
 
     }
 

@@ -28,21 +28,22 @@ function getSelfieSegmenter(options = defaultSelfieSegmentationOptions) {
     const selfieSegmentation = new selfie_segmentation_1.SelfieSegmentation({
         locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/${file}`,
     });
-    selfieSegmentation.setOptions((0, deepmerge_1.default)(defaultSelfieSegmentationOptions, options));
+    const selfieSegmenterOptions = (0, deepmerge_1.default)(defaultSelfieSegmentationOptions, options);
+    selfieSegmentation.setOptions(selfieSegmenterOptions);
     return selfieSegmentation;
 }
 function useSelfieSegmenter({ onResults, }) {
     const videoRef = react_1.default.useRef(null);
     const selfieSegmentationRef = react_1.default.useRef();
     const isSelfieSegmentationRunningRef = react_1.default.useRef(false);
-    function predictSelfieSegmentation(time_1, stream_1) {
-        return __awaiter(this, arguments, void 0, function* (time, stream, selfieSegmentationOptions = defaultSelfieSegmentationOptions) {
+    function predictSelfieSegmentation(time, stream) {
+        return __awaiter(this, void 0, void 0, function* () {
             var _a, _b;
             if (!isSelfieSegmentationRunningRef.current)
                 return;
             if ((0, canPlayStream_1.default)(stream) && (0, canReadVideo_1.default)(videoRef.current) && selfieSegmentationRef.current) {
                 yield ((_a = selfieSegmentationRef.current) === null || _a === void 0 ? void 0 : _a.send({ image: videoRef.current }));
-                (_b = videoRef.current) === null || _b === void 0 ? void 0 : _b.requestVideoFrameCallback((time) => predictSelfieSegmentation(time, stream, selfieSegmentationOptions));
+                (_b = videoRef.current) === null || _b === void 0 ? void 0 : _b.requestVideoFrameCallback((time) => predictSelfieSegmentation(time, stream));
             }
         });
     }
@@ -67,7 +68,7 @@ function useSelfieSegmenter({ onResults, }) {
                 videoRef.current.play();
             };
             const _stream = videoRef.current.srcObject;
-            videoRef.current.requestVideoFrameCallback((time) => predictSelfieSegmentation(time, _stream, selfieSegmentationOptions));
+            videoRef.current.requestVideoFrameCallback((time) => predictSelfieSegmentation(time, _stream));
         });
     }
     function stopSelfieSegmenter() {

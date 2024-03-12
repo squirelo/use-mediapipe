@@ -20,6 +20,7 @@ Object.defineProperty(exports, "HandLandmarker", { enumerable: true, get: functi
 const canPlayStream_1 = __importDefault(require("./canPlayStream"));
 const const_1 = require("./const");
 const canReadVideo_1 = __importDefault(require("./canReadVideo"));
+const stopVideo_1 = __importDefault(require("./stopVideo"));
 exports.defaultHandLandmarkerOptions = {
     baseOptions: {
         modelAssetPath: `https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task`,
@@ -43,9 +44,12 @@ exports.getHandLandmarker = getHandLandmarker;
 function useHandLandmarker({ onResults, }) {
     const videoRef = react_1.default.useRef(null);
     const handLandmarkerRef = react_1.default.useRef();
+    const ishHandLandmarkerRunningRef = react_1.default.useRef(false);
     function predictHandLandmarks(time_1, stream_1) {
         return __awaiter(this, arguments, void 0, function* (time, stream, handLandmarkerOptions = exports.defaultHandLandmarkerOptions) {
             var _a, _b, _c;
+            if (!ishHandLandmarkerRunningRef.current)
+                return;
             if ((0, canPlayStream_1.default)(stream) && (0, canReadVideo_1.default)(videoRef.current) && handLandmarkerRef.current) {
                 const video = videoRef.current;
                 if (handLandmarkerOptions.runningMode === 'IMAGE') {
@@ -57,7 +61,9 @@ function useHandLandmarker({ onResults, }) {
                     onResults === null || onResults === void 0 ? void 0 : onResults(results, stream);
                 }
             }
-            (_c = videoRef.current) === null || _c === void 0 ? void 0 : _c.requestVideoFrameCallback((time) => predictHandLandmarks(time, stream, handLandmarkerOptions));
+            if (videoRef.current && handLandmarkerOptions.runningMode === 'VIDEO') {
+                (_c = videoRef.current) === null || _c === void 0 ? void 0 : _c.requestVideoFrameCallback((time) => predictHandLandmarks(time, stream, handLandmarkerOptions));
+            }
         });
     }
     function startHandLandmarker() {
@@ -66,6 +72,7 @@ function useHandLandmarker({ onResults, }) {
             handLandmarkerOptions: undefined,
             userMediaOptions: undefined,
         }) {
+            ishHandLandmarkerRunningRef.current = true;
             handLandmarkerRef.current = yield getHandLandmarker(handLandmarkerOptions);
             videoRef.current = document.createElement("video");
             videoRef.current.muted = true;
@@ -81,6 +88,15 @@ function useHandLandmarker({ onResults, }) {
             videoRef.current.requestVideoFrameCallback((time) => predictHandLandmarks(time, _stream, handLandmarkerOptions));
         });
     }
-    return startHandLandmarker;
+    function stopHandLandmarker() {
+        (0, stopVideo_1.default)(videoRef.current);
+        ishHandLandmarkerRunningRef.current = false;
+    }
+    react_1.default.useEffect(() => {
+        return () => {
+            stopHandLandmarker();
+        };
+    }, []);
+    return { startHandLandmarker, stopHandLandmarker };
 }
 exports.useHandLandmarker = useHandLandmarker;

@@ -20,6 +20,7 @@ const canPlayStream_1 = __importDefault(require("./canPlayStream"));
 const deepmerge_1 = __importDefault(require("deepmerge"));
 const const_1 = require("./const");
 const canReadVideo_1 = __importDefault(require("./canReadVideo"));
+const stopVideo_1 = __importDefault(require("./stopVideo"));
 exports.defaultGestureRecognizerOptions = {
     baseOptions: {
         modelAssetPath: 'https://storage.googleapis.com/mediapipe-models/gesture_recognizer/gesture_recognizer/float16/1/gesture_recognizer.task',
@@ -40,9 +41,12 @@ exports.getGestureRecognizer = getGestureRecognizer;
 function useGestureRecognizer({ onResults, }) {
     const videoRef = react_1.default.useRef(null);
     const gestureRecognizerRef = react_1.default.useRef();
+    const isGestureRecognizerRunningRef = react_1.default.useRef(false);
     function predictGesture(time_1, stream_1) {
         return __awaiter(this, arguments, void 0, function* (time, stream, gestureRecognizerOptions = exports.defaultGestureRecognizerOptions) {
             var _a, _b, _c;
+            if (!isGestureRecognizerRunningRef.current)
+                return;
             if ((0, canPlayStream_1.default)(stream) && (0, canReadVideo_1.default)(videoRef.current) && gestureRecognizerRef.current) {
                 const video = videoRef.current;
                 if (gestureRecognizerOptions.runningMode === 'IMAGE') {
@@ -54,7 +58,9 @@ function useGestureRecognizer({ onResults, }) {
                     onResults === null || onResults === void 0 ? void 0 : onResults(results, stream);
                 }
             }
-            (_c = videoRef.current) === null || _c === void 0 ? void 0 : _c.requestVideoFrameCallback((time) => predictGesture(time, stream, gestureRecognizerOptions));
+            if (videoRef.current && gestureRecognizerOptions.runningMode === 'VIDEO') {
+                (_c = videoRef.current) === null || _c === void 0 ? void 0 : _c.requestVideoFrameCallback((time) => predictGesture(time, stream, gestureRecognizerOptions));
+            }
         });
     }
     function startGestureTracking() {
@@ -62,6 +68,7 @@ function useGestureRecognizer({ onResults, }) {
             stream: undefined,
             gestureRecognizerOptions: undefined,
         }) {
+            isGestureRecognizerRunningRef.current = true;
             gestureRecognizerRef.current = yield getGestureRecognizer(gestureRecognizerOptions);
             videoRef.current = document.createElement("video");
             videoRef.current.playsInline = true;
@@ -75,6 +82,15 @@ function useGestureRecognizer({ onResults, }) {
             videoRef.current.requestVideoFrameCallback((time) => predictGesture(time, _stream, gestureRecognizerOptions));
         });
     }
-    return startGestureTracking;
+    function stopGestureTracking() {
+        (0, stopVideo_1.default)(videoRef.current);
+        isGestureRecognizerRunningRef.current = false;
+    }
+    react_1.default.useEffect(() => {
+        return () => {
+            stopGestureTracking();
+        };
+    }, []);
+    return { startGestureTracking, stopGestureTracking };
 }
 exports.useGestureRecognizer = useGestureRecognizer;

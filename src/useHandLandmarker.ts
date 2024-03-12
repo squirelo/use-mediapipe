@@ -5,6 +5,7 @@ import { RunningMode } from "./types";
 import canPlayStream from "./canPlayStream";
 import { tasksVisionVersion, defaultUserMediaOptions } from "./const";
 import canReadVideo from "./canReadVideo";
+import stopVideo from "./stopVideo";
 
 export { HandLandmarker, HandLandmarkerOptions, HandLandmarkerResult };
 
@@ -36,8 +37,10 @@ export function useHandLandmarker({
 }) {
     const videoRef = React.useRef<HTMLVideoElement | null>(null);
     const handLandmarkerRef = React.useRef<HandLandmarker>();
+    const ishHandLandmarkerRunningRef = React.useRef<boolean>(false);
 
     async function predictHandLandmarks(time: number, stream?: MediaStream, handLandmarkerOptions: HandLandmarkerOptions = defaultHandLandmarkerOptions) {
+        if (!ishHandLandmarkerRunningRef.current) return;
         if (canPlayStream(stream) && canReadVideo(videoRef.current) && handLandmarkerRef.current) {
             const video = videoRef.current as HTMLVideoElement;
             if (handLandmarkerOptions.runningMode === 'IMAGE') {
@@ -48,7 +51,9 @@ export function useHandLandmarker({
                 onResults?.(results, stream);
             }
         }
-        videoRef.current?.requestVideoFrameCallback((time) => predictHandLandmarks(time, stream, handLandmarkerOptions));
+        if (videoRef.current && handLandmarkerOptions.runningMode === 'VIDEO') {
+            videoRef.current?.requestVideoFrameCallback((time) => predictHandLandmarks(time, stream, handLandmarkerOptions));
+        }
     }
 
     async function startHandLandmarker({
@@ -64,6 +69,7 @@ export function useHandLandmarker({
             handLandmarkerOptions: undefined,
             userMediaOptions: undefined,
         }) {
+        ishHandLandmarkerRunningRef.current = true;
         handLandmarkerRef.current = await getHandLandmarker(handLandmarkerOptions);
         videoRef.current = document.createElement("video");
         videoRef.current.muted = true;
@@ -82,6 +88,17 @@ export function useHandLandmarker({
 
     }
 
-    return startHandLandmarker;
+    function stopHandLandmarker() {
+        stopVideo(videoRef.current);
+        ishHandLandmarkerRunningRef.current = false;
+    }
+
+    React.useEffect(() => {
+        return () => {
+            stopHandLandmarker();
+        }
+    }, []);
+
+    return { startHandLandmarker, stopHandLandmarker };
 
 }

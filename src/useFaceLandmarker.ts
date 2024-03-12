@@ -5,6 +5,7 @@ import { RunningMode } from "./types";
 import canPlayStream from "./canPlayStream";
 import { tasksVisionVersion, defaultUserMediaOptions } from "./const";
 import canReadVideo from "./canReadVideo";
+import stopVideo from "./stopVideo";
 
 export { FaceLandmarker, FaceLandmarkerOptions, FaceLandmarkerResult };
 
@@ -35,8 +36,10 @@ export function useFaceLandmarker({
 }) {
     const videoRef = React.useRef<HTMLVideoElement | null>(null);
     const faceLandmarkerRef = React.useRef<FaceLandmarker>();
+    const isFaceLandmarkerRunningRef = React.useRef<boolean>(false);
 
     async function predictFaceLandmarks(time: number, stream?: MediaStream, faceLandmarkerOptions: FaceLandmarkerOptions = defaultFaceLandmarkerOptions) {
+        if (!isFaceLandmarkerRunningRef.current) return;
         if (canPlayStream(stream) && canReadVideo(videoRef.current) && faceLandmarkerRef.current) {
             const video = videoRef.current as HTMLVideoElement;
             if (faceLandmarkerOptions.runningMode === 'IMAGE') {
@@ -47,7 +50,9 @@ export function useFaceLandmarker({
                 onResults?.(results, stream);
             }
         }
-        videoRef.current?.requestVideoFrameCallback((time) => predictFaceLandmarks(time, stream, faceLandmarkerOptions));
+        if (videoRef.current && faceLandmarkerOptions.runningMode === 'VIDEO') {
+            videoRef.current?.requestVideoFrameCallback((time) => predictFaceLandmarks(time, stream, faceLandmarkerOptions));
+        }
     }
 
     async function startFaceLandmarker({
@@ -63,6 +68,7 @@ export function useFaceLandmarker({
             faceLandmarkerOptions: undefined,
             userMediaOptions: undefined,
         }) {
+        isFaceLandmarkerRunningRef.current = true;
         faceLandmarkerRef.current = await getFaceLandmarker(faceLandmarkerOptions);
         videoRef.current = document.createElement("video");
         videoRef.current.muted = true;
@@ -81,6 +87,17 @@ export function useFaceLandmarker({
 
     }
 
-    return startFaceLandmarker;
+    function stopFaceLandmarker() {
+        stopVideo(videoRef.current);
+        isFaceLandmarkerRunningRef.current = false;
+    }
+
+    React.useEffect(() => {
+        return () => {
+            stopFaceLandmarker();
+        }
+    }, []);
+
+    return { startFaceLandmarker, stopFaceLandmarker };
 
 }

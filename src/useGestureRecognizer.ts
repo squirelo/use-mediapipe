@@ -5,6 +5,7 @@ import canPlayStream from "./canPlayStream";
 import deepmerge from "deepmerge";
 import { tasksVisionVersion, defaultUserMediaOptions } from "./const";
 import canReadVideo from "./canReadVideo";
+import stopVideo from "./stopVideo";
 
 export { GestureRecognizer, GestureRecognizerOptions, GestureRecognizerResult };
 
@@ -33,8 +34,10 @@ export function useGestureRecognizer({
 }) {
     const videoRef = React.useRef<HTMLVideoElement | null>(null);
     const gestureRecognizerRef = React.useRef<GestureRecognizer>();
+    const isGestureRecognizerRunningRef = React.useRef<boolean>(false);
 
     async function predictGesture(time: number, stream?: MediaStream, gestureRecognizerOptions: GestureRecognizerOptions = defaultGestureRecognizerOptions) {
+        if (!isGestureRecognizerRunningRef.current) return;
         if (canPlayStream(stream) && canReadVideo(videoRef.current) && gestureRecognizerRef.current) {
             const video = videoRef.current as HTMLVideoElement;
             if (gestureRecognizerOptions.runningMode === 'IMAGE') {
@@ -45,7 +48,9 @@ export function useGestureRecognizer({
                 onResults?.(results, stream);
             }
         }
-        videoRef.current?.requestVideoFrameCallback((time) => predictGesture(time, stream, gestureRecognizerOptions));
+        if (videoRef.current && gestureRecognizerOptions.runningMode === 'VIDEO') {
+            videoRef.current?.requestVideoFrameCallback((time) => predictGesture(time, stream, gestureRecognizerOptions));
+        }
     }
 
     async function startGestureTracking({
@@ -60,6 +65,7 @@ export function useGestureRecognizer({
             stream: undefined,
             gestureRecognizerOptions: undefined,
         }) {
+        isGestureRecognizerRunningRef.current = true;
         gestureRecognizerRef.current = await getGestureRecognizer(gestureRecognizerOptions);
         videoRef.current = document.createElement("video");
         videoRef.current.playsInline = true;
@@ -75,5 +81,17 @@ export function useGestureRecognizer({
         videoRef.current.requestVideoFrameCallback((time) => predictGesture(time, _stream, gestureRecognizerOptions));
     }
 
-    return startGestureTracking;
+    function stopGestureTracking() {
+        stopVideo(videoRef.current);
+        isGestureRecognizerRunningRef.current = false;
+    }
+
+    React.useEffect(() => {
+        return () => {
+            stopGestureTracking();
+        }
+    }, []);
+
+    return { startGestureTracking, stopGestureTracking };
+
 }

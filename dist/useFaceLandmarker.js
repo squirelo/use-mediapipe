@@ -20,6 +20,7 @@ Object.defineProperty(exports, "FaceLandmarker", { enumerable: true, get: functi
 const canPlayStream_1 = __importDefault(require("./canPlayStream"));
 const const_1 = require("./const");
 const canReadVideo_1 = __importDefault(require("./canReadVideo"));
+const stopVideo_1 = __importDefault(require("./stopVideo"));
 exports.defaultFaceLandmarkerOptions = {
     baseOptions: {
         modelAssetPath: `https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task`,
@@ -42,9 +43,12 @@ exports.getFaceLandmarker = getFaceLandmarker;
 function useFaceLandmarker({ onResults, }) {
     const videoRef = react_1.default.useRef(null);
     const faceLandmarkerRef = react_1.default.useRef();
+    const isFaceLandmarkerRunningRef = react_1.default.useRef(false);
     function predictFaceLandmarks(time_1, stream_1) {
         return __awaiter(this, arguments, void 0, function* (time, stream, faceLandmarkerOptions = exports.defaultFaceLandmarkerOptions) {
             var _a, _b, _c;
+            if (!isFaceLandmarkerRunningRef.current)
+                return;
             if ((0, canPlayStream_1.default)(stream) && (0, canReadVideo_1.default)(videoRef.current) && faceLandmarkerRef.current) {
                 const video = videoRef.current;
                 if (faceLandmarkerOptions.runningMode === 'IMAGE') {
@@ -56,7 +60,9 @@ function useFaceLandmarker({ onResults, }) {
                     onResults === null || onResults === void 0 ? void 0 : onResults(results, stream);
                 }
             }
-            (_c = videoRef.current) === null || _c === void 0 ? void 0 : _c.requestVideoFrameCallback((time) => predictFaceLandmarks(time, stream, faceLandmarkerOptions));
+            if (videoRef.current && faceLandmarkerOptions.runningMode === 'VIDEO') {
+                (_c = videoRef.current) === null || _c === void 0 ? void 0 : _c.requestVideoFrameCallback((time) => predictFaceLandmarks(time, stream, faceLandmarkerOptions));
+            }
         });
     }
     function startFaceLandmarker() {
@@ -65,6 +71,7 @@ function useFaceLandmarker({ onResults, }) {
             faceLandmarkerOptions: undefined,
             userMediaOptions: undefined,
         }) {
+            isFaceLandmarkerRunningRef.current = true;
             faceLandmarkerRef.current = yield getFaceLandmarker(faceLandmarkerOptions);
             videoRef.current = document.createElement("video");
             videoRef.current.muted = true;
@@ -80,6 +87,15 @@ function useFaceLandmarker({ onResults, }) {
             videoRef.current.requestVideoFrameCallback((time) => predictFaceLandmarks(time, _stream, faceLandmarkerOptions));
         });
     }
-    return startFaceLandmarker;
+    function stopFaceLandmarker() {
+        (0, stopVideo_1.default)(videoRef.current);
+        isFaceLandmarkerRunningRef.current = false;
+    }
+    react_1.default.useEffect(() => {
+        return () => {
+            stopFaceLandmarker();
+        };
+    }, []);
+    return { startFaceLandmarker, stopFaceLandmarker };
 }
 exports.useFaceLandmarker = useFaceLandmarker;

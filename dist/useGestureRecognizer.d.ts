@@ -1,5 +1,5 @@
 import { GestureRecognizer, GestureRecognizerOptions, GestureRecognizerResult } from "@mediapipe/tasks-vision";
-export { GestureRecognizer, GestureRecognizerOptions, GestureRecognizerResult };
+export type { GestureRecognizer, GestureRecognizerOptions, GestureRecognizerResult };
 export declare const defaultGestureRecognizerOptions: {
     baseOptions: {
         modelAssetPath: string;

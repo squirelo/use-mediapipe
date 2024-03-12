@@ -1,11 +1,13 @@
 import React from "react";
-import { FaceDetector, FilesetResolver, FaceDetectorResult, FaceDetectorOptions } from "@mediapipe/tasks-vision";
+import { FilesetResolver, FaceDetector, FaceDetectorOptions, FaceDetectorResult } from "@mediapipe/tasks-vision";
 import { RunningMode } from "./types";
 import canPlayStream from "./canPlayStream";
 import deepmerge from "deepmerge";
 import { tasksVisionVersion, defaultUserMediaOptions } from "./const";
 import canReadVideo from "./canReadVideo";
 import stopVideo from "./stopVideo";
+
+export type { FaceDetector, FaceDetectorOptions, FaceDetectorResult };
 
 export const defaultFaceDetectorOptions: FaceDetectorOptions = {
     baseOptions: {

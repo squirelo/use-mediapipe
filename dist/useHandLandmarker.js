@@ -12,11 +12,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.useHandLandmarker = exports.getHandLandmarker = exports.defaultHandLandmarkerOptions = exports.HandLandmarker = void 0;
+exports.useHandLandmarker = exports.getHandLandmarker = exports.defaultHandLandmarkerOptions = void 0;
 const react_1 = __importDefault(require("react"));
 const deepmerge_1 = __importDefault(require("deepmerge"));
 const tasks_vision_1 = require("@mediapipe/tasks-vision");
-Object.defineProperty(exports, "HandLandmarker", { enumerable: true, get: function () { return tasks_vision_1.HandLandmarker; } });
 const canPlayStream_1 = __importDefault(require("./canPlayStream"));
 const const_1 = require("./const");
 const canReadVideo_1 = __importDefault(require("./canReadVideo"));

@@ -1,4 +1,5 @@
-import { FaceDetector, FaceDetectorResult, FaceDetectorOptions } from "@mediapipe/tasks-vision";
+import { FaceDetector, FaceDetectorOptions, FaceDetectorResult } from "@mediapipe/tasks-vision";
+export type { FaceDetector, FaceDetectorOptions, FaceDetectorResult };
 export declare const defaultFaceDetectorOptions: FaceDetectorOptions;
 export declare function getFaceDetector(options?: FaceDetectorOptions): Promise<FaceDetector>;
 export declare function useFaceDetector({ onResults, }: {

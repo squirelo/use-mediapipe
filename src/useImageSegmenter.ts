@@ -7,7 +7,7 @@ import { tasksVisionVersion, defaultUserMediaOptions } from "./const";
 import canReadVideo from "./canReadVideo";
 import stopVideo from "./stopVideo";
 
-export { ImageSegmenter, ImageSegmenterOptions, ImageSegmenterResult };
+export type { ImageSegmenter, ImageSegmenterOptions, ImageSegmenterResult };
 
 export const defaultImageSegmenterOptions: ImageSegmenterOptions = {
     baseOptions: {

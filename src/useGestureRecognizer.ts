@@ -7,7 +7,7 @@ import { tasksVisionVersion, defaultUserMediaOptions } from "./const";
 import canReadVideo from "./canReadVideo";
 import stopVideo from "./stopVideo";
 
-export { GestureRecognizer, GestureRecognizerOptions, GestureRecognizerResult };
+export type { GestureRecognizer, GestureRecognizerOptions, GestureRecognizerResult };
 
 export const defaultGestureRecognizerOptions = {
     baseOptions: {

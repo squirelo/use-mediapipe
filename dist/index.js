@@ -18,5 +18,6 @@ __exportStar(require("./useFaceDetector"), exports);
 __exportStar(require("./useFaceLandmarker"), exports);
 __exportStar(require("./useHandLandmarker"), exports);
 __exportStar(require("./useGestureRecognizer"), exports);
-__exportStar(require("./useImageSegmentation"), exports);
+__exportStar(require("./useImageSegmenter"), exports);
+__exportStar(require("./useSelfieSegmenter"), exports);
 __exportStar(require("./types"), exports);

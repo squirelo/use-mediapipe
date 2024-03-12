@@ -1,13 +1,13 @@
 import React from "react";
 import deepmerge from "deepmerge";
-import { HandLandmarker, HandLandmarkerOptions, HandLandmarkerResult, FilesetResolver } from "@mediapipe/tasks-vision";
+import { FilesetResolver, HandLandmarker, HandLandmarkerOptions, HandLandmarkerResult } from "@mediapipe/tasks-vision";
 import { RunningMode } from "./types";
 import canPlayStream from "./canPlayStream";
 import { tasksVisionVersion, defaultUserMediaOptions } from "./const";
 import canReadVideo from "./canReadVideo";
 import stopVideo from "./stopVideo";
 
-export { HandLandmarker, HandLandmarkerOptions, HandLandmarkerResult };
+export type { HandLandmarker, HandLandmarkerOptions, HandLandmarkerResult };
 
 export const defaultHandLandmarkerOptions: HandLandmarkerOptions = {
     baseOptions: {

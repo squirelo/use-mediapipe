@@ -1,13 +1,13 @@
 import React from "react";
 import deepmerge from "deepmerge";
-import { FaceLandmarker, FaceLandmarkerOptions, FaceLandmarkerResult, FilesetResolver } from "@mediapipe/tasks-vision";
+import { FilesetResolver, FaceLandmarker, FaceLandmarkerOptions, FaceLandmarkerResult } from "@mediapipe/tasks-vision";
 import { RunningMode } from "./types";
 import canPlayStream from "./canPlayStream";
 import { tasksVisionVersion, defaultUserMediaOptions } from "./const";
 import canReadVideo from "./canReadVideo";
 import stopVideo from "./stopVideo";
 
-export { FaceLandmarker, FaceLandmarkerOptions, FaceLandmarkerResult };
+export type { FaceLandmarker, FaceLandmarkerOptions, FaceLandmarkerResult };
 
 export const defaultFaceLandmarkerOptions: FaceLandmarkerOptions = {
     baseOptions: {

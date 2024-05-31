@@ -3,14 +3,16 @@ import { FilesetResolver, GestureRecognizer, GestureRecognizerOptions, GestureRe
 import { RunningMode } from "./types";
 import canPlayStream from "./canPlayStream";
 import deepmerge from "deepmerge";
-import { defaultUserMediaOptions } from "./utils";
+import { tasksVisionVersion, defaultUserMediaOptions } from "./const";
+import canReadVideo from "./canReadVideo";
+import stopVideo from "./stopVideo";
 
-export { GestureRecognizer, GestureRecognizerOptions, GestureRecognizerResult };
+export type { GestureRecognizer, GestureRecognizerOptions, GestureRecognizerResult };
 
 export const defaultGestureRecognizerOptions = {
     baseOptions: {
         modelAssetPath: 'https://storage.googleapis.com/mediapipe-models/gesture_recognizer/gesture_recognizer/float16/1/gesture_recognizer.task',
-        delegate: "GPU",
+        delegate: "GPU" as "GPU" | "CPU",
     },
     runningMode: 'VIDEO' as RunningMode,
     numHands: 2,
@@ -18,7 +20,7 @@ export const defaultGestureRecognizerOptions = {
 
 export async function getGestureRecognizer(options: GestureRecognizerOptions = {}): Promise<GestureRecognizer> {
     const tasksVision = await FilesetResolver.forVisionTasks(
-        "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm"
+        `https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@${tasksVisionVersion}/wasm`
     );
     const gestureRecognizerOptions: GestureRecognizerOptions = deepmerge(defaultGestureRecognizerOptions, options);
     const gestureRecognizer = await GestureRecognizer.createFromOptions(tasksVision, gestureRecognizerOptions);
@@ -28,18 +30,17 @@ export async function getGestureRecognizer(options: GestureRecognizerOptions = {
 export function useGestureRecognizer({
     onResults,
 }: {
-    onResults: (result?: GestureRecognizerResult, stream?: MediaStream) => void;
+    onResults: (result: GestureRecognizerResult, stream?: MediaStream) => void;
 }) {
     const videoRef = React.useRef<HTMLVideoElement | null>(null);
     const gestureRecognizerRef = React.useRef<GestureRecognizer>();
-    const lastVideoTimeRef = React.useRef<number>(-1);
+    const isGestureRecognizerRunningRef = React.useRef<boolean>(false);
 
     async function predictGesture(time: number, stream?: MediaStream) {
-        if (!videoRef.current || !gestureRecognizerRef.current) return;
-        const currentTime = videoRef.current.currentTime;
-        if (canPlayStream(stream) && currentTime > lastVideoTimeRef.current && videoRef.current.videoWidth > 0 && videoRef.current.videoHeight > 0) {
-            lastVideoTimeRef.current = currentTime;
-            const results = await gestureRecognizerRef.current?.recognizeForVideo(videoRef.current, time);
+        if (!isGestureRecognizerRunningRef.current) return;
+        if (canPlayStream(stream) && canReadVideo(videoRef.current) && gestureRecognizerRef.current) {
+            const video = videoRef.current as HTMLVideoElement;
+            const results = await gestureRecognizerRef.current?.recognizeForVideo(video, time);
             onResults?.(results, stream);
         }
         videoRef.current?.requestVideoFrameCallback((time) => predictGesture(time, stream));
@@ -57,6 +58,7 @@ export function useGestureRecognizer({
             stream: undefined,
             gestureRecognizerOptions: undefined,
         }) {
+        isGestureRecognizerRunningRef.current = true;
         gestureRecognizerRef.current = await getGestureRecognizer(gestureRecognizerOptions);
         videoRef.current = document.createElement("video");
         videoRef.current.playsInline = true;
@@ -72,5 +74,17 @@ export function useGestureRecognizer({
         videoRef.current.requestVideoFrameCallback((time) => predictGesture(time, _stream));
     }
 
-    return startGestureTracking;
+    function stopGestureTracking() {
+        stopVideo(videoRef.current);
+        isGestureRecognizerRunningRef.current = false;
+    }
+
+    React.useEffect(() => {
+        return () => {
+            stopGestureTracking();
+        }
+    }, []);
+
+    return { startGestureTracking, stopGestureTracking };
+
 }

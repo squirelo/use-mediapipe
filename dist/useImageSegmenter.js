@@ -12,54 +12,58 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.useFaceDetector = exports.getFaceDetector = exports.defaultFaceDetectorOptions = void 0;
+exports.useImageSegmenter = exports.getImageSegmenter = exports.defaultImageSegmenterOptions = void 0;
 const react_1 = __importDefault(require("react"));
+const deepmerge_1 = __importDefault(require("deepmerge"));
 const tasks_vision_1 = require("@mediapipe/tasks-vision");
 const canPlayStream_1 = __importDefault(require("./canPlayStream"));
-const deepmerge_1 = __importDefault(require("deepmerge"));
 const const_1 = require("./const");
 const canReadVideo_1 = __importDefault(require("./canReadVideo"));
 const stopVideo_1 = __importDefault(require("./stopVideo"));
-exports.defaultFaceDetectorOptions = {
+exports.defaultImageSegmenterOptions = {
     baseOptions: {
-        modelAssetPath: `https://storage.googleapis.com/mediapipe-models/face_detector/blaze_face_short_range/float16/1/blaze_face_short_range.tflite`,
-        delegate: "GPU"
+        modelAssetPath: "https://storage.googleapis.com/mediapipe-assets/deeplabv3.tflite?generation=1661875711618421",
     },
+    outputCategoryMask: true,
+    outputConfidenceMasks: false,
     runningMode: 'VIDEO',
 };
-function getFaceDetector() {
-    return __awaiter(this, arguments, void 0, function* (options = exports.defaultFaceDetectorOptions) {
+function getImageSegmenter() {
+    return __awaiter(this, arguments, void 0, function* (options = {}) {
         const vision = yield tasks_vision_1.FilesetResolver.forVisionTasks(`https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@${const_1.tasksVisionVersion}/wasm`);
-        const faceDetectorOptions = (0, deepmerge_1.default)(exports.defaultFaceDetectorOptions, options);
-        const faceDetector = yield tasks_vision_1.FaceDetector.createFromOptions(vision, faceDetectorOptions);
-        return faceDetector;
+        const imageSegmenterOptions = (0, deepmerge_1.default)(exports.defaultImageSegmenterOptions, options);
+        const imageSegmenter = yield tasks_vision_1.ImageSegmenter.createFromOptions(vision, imageSegmenterOptions);
+        return imageSegmenter;
     });
 }
-exports.getFaceDetector = getFaceDetector;
-function useFaceDetector({ onResults, }) {
+exports.getImageSegmenter = getImageSegmenter;
+function useImageSegmenter({ onResults, }) {
     const videoRef = react_1.default.useRef(null);
-    const faceDetectorRef = react_1.default.useRef();
-    const isFaceDetectionRunningRef = react_1.default.useRef(false);
-    function predictFaceDetections(time, stream) {
+    const imageSegmenterRef = react_1.default.useRef();
+    const isImageSegmenterRunningRef = react_1.default.useRef(false);
+    function predictImageSegmentations(time, stream) {
         return __awaiter(this, void 0, void 0, function* () {
-            var _a, _b;
-            if (!isFaceDetectionRunningRef.current)
+            var _a;
+            if (!isImageSegmenterRunningRef.current)
                 return;
-            if ((0, canPlayStream_1.default)(stream) && (0, canReadVideo_1.default)(videoRef.current) && faceDetectorRef.current) {
+            if ((0, canPlayStream_1.default)(stream) && (0, canReadVideo_1.default)(videoRef.current) && imageSegmenterRef.current) {
                 const video = videoRef.current;
-                const results = yield ((_a = faceDetectorRef.current) === null || _a === void 0 ? void 0 : _a.detectForVideo(video, time));
-                onResults === null || onResults === void 0 ? void 0 : onResults(results, stream);
+                (_a = imageSegmenterRef.current) === null || _a === void 0 ? void 0 : _a.segmentForVideo(video, time, (results) => {
+                    var _a;
+                    onResults(results, stream);
+                    (_a = videoRef.current) === null || _a === void 0 ? void 0 : _a.requestVideoFrameCallback((time) => predictImageSegmentations(time, stream));
+                });
             }
-            (_b = videoRef.current) === null || _b === void 0 ? void 0 : _b.requestVideoFrameCallback((time) => predictFaceDetections(time, stream));
         });
     }
-    function startFaceDetection() {
-        return __awaiter(this, arguments, void 0, function* ({ stream, faceDetectorOptions, userMediaOptions, } = {
+    function startImageSegmenter() {
+        return __awaiter(this, arguments, void 0, function* ({ stream, imageSegmenterOptions, userMediaOptions, } = {
             stream: undefined,
-            faceDetectorOptions: undefined,
+            imageSegmenterOptions: undefined,
+            userMediaOptions: undefined,
         }) {
-            isFaceDetectionRunningRef.current = true;
-            faceDetectorRef.current = yield getFaceDetector(faceDetectorOptions);
+            isImageSegmenterRunningRef.current = true;
+            imageSegmenterRef.current = yield getImageSegmenter(imageSegmenterOptions);
             videoRef.current = document.createElement("video");
             videoRef.current.muted = true;
             videoRef.current.autoplay = true;
@@ -71,18 +75,18 @@ function useFaceDetector({ onResults, }) {
                 videoRef.current.play();
             };
             const _stream = videoRef.current.srcObject;
-            videoRef.current.requestVideoFrameCallback((time) => predictFaceDetections(time, _stream));
+            videoRef.current.requestVideoFrameCallback((time) => predictImageSegmentations(time, _stream));
         });
     }
-    function stopFaceDetection() {
+    function stopImageSegmenter() {
         (0, stopVideo_1.default)(videoRef.current);
-        isFaceDetectionRunningRef.current = false;
+        isImageSegmenterRunningRef.current = false;
     }
     react_1.default.useEffect(() => {
         return () => {
-            stopFaceDetection();
+            stopImageSegmenter();
         };
     }, []);
-    return { startFaceDetection, stopFaceDetection };
+    return { startImageSegmenter, stopImageSegmenter };
 }
-exports.useFaceDetector = useFaceDetector;
+exports.useImageSegmenter = useImageSegmenter;

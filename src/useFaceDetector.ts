@@ -1,9 +1,13 @@
 import React from "react";
-import { FaceDetector, FilesetResolver, FaceDetectorResult, FaceDetectorOptions } from "@mediapipe/tasks-vision";
+import { FilesetResolver, FaceDetector, FaceDetectorOptions, FaceDetectorResult } from "@mediapipe/tasks-vision";
 import { RunningMode } from "./types";
 import canPlayStream from "./canPlayStream";
 import deepmerge from "deepmerge";
-import { defaultUserMediaOptions } from "./utils";
+import { tasksVisionVersion, defaultUserMediaOptions } from "./const";
+import canReadVideo from "./canReadVideo";
+import stopVideo from "./stopVideo";
+
+export type { FaceDetector, FaceDetectorOptions, FaceDetectorResult };
 
 export const defaultFaceDetectorOptions: FaceDetectorOptions = {
     baseOptions: {
@@ -15,7 +19,7 @@ export const defaultFaceDetectorOptions: FaceDetectorOptions = {
 
 export async function getFaceDetector(options: FaceDetectorOptions = defaultFaceDetectorOptions) {
     const vision = await FilesetResolver.forVisionTasks(
-        "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm"
+        `https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@${tasksVisionVersion}/wasm`
     );
     const faceDetectorOptions = deepmerge(defaultFaceDetectorOptions, options);
     const faceDetector = await FaceDetector.createFromOptions(vision, faceDetectorOptions);
@@ -29,14 +33,13 @@ export function useFaceDetector({
 }) {
     const videoRef = React.useRef<HTMLVideoElement | null>(null);
     const faceDetectorRef = React.useRef<FaceDetector>();
-    const lastVideoTimeRef = React.useRef<number>(-1);
+    const isFaceDetectionRunningRef = React.useRef<boolean>(false);
 
     async function predictFaceDetections(time: number, stream?: MediaStream) {
-        if (!videoRef.current || !faceDetectorRef.current) return;
-        const currentTime = videoRef.current.currentTime;
-        if (canPlayStream(stream) && currentTime > lastVideoTimeRef.current && videoRef.current.videoWidth > 0 && videoRef.current.videoHeight > 0) {
-            lastVideoTimeRef.current = currentTime;
-            const results = await faceDetectorRef.current?.detectForVideo(videoRef.current, time);
+        if (!isFaceDetectionRunningRef.current) return;
+        if (canPlayStream(stream) && canReadVideo(videoRef.current) && faceDetectorRef.current) {
+            const video = videoRef.current as HTMLVideoElement;
+            const results = await faceDetectorRef.current?.detectForVideo(video, time);
             onResults?.(results, stream);
         }
         videoRef.current?.requestVideoFrameCallback((time) => predictFaceDetections(time, stream));
@@ -54,6 +57,7 @@ export function useFaceDetector({
             stream: undefined,
             faceDetectorOptions: undefined,
         }) {
+        isFaceDetectionRunningRef.current = true;
         faceDetectorRef.current = await getFaceDetector(faceDetectorOptions);
         videoRef.current = document.createElement("video");
         videoRef.current.muted = true;
@@ -72,153 +76,17 @@ export function useFaceDetector({
 
     }
 
-    return startFaceDetection;
-
-}
-
-/*
-// import { get } from "lodash";
-// import useWindowSize from "~/hooks/useWindowSize";
-// import { Face } from "../types";
-// import useCamStore from "./useCamStore";
-// import getUserMedia from "../utils/getUserMedia";
-// import { RunningMode } from "../types";
-// import getDistanceBetweenPoints from "../utils/getDistanceBetweenPoints";
-
-function calculateFaceRoll(leftTragion: [number, number], rightTragion: [number, number]): number {
-    // Extract the x and y coordinates
-    const [leftX, leftY] = leftTragion;
-    const [rightX, rightY] = rightTragion;
-
-    // Calculate differences in the x and y coordinates
-    const deltaY = rightY - leftY;
-    const deltaX = rightX - leftX;
-
-    // Calculate the angle in radians
-    const angleRadians = Math.atan2(deltaY, deltaX);
-
-    // Convert radians to degrees
-    const angleDegrees = angleRadians * (180 / Math.PI);
-
-    // Return the calculated angle
-    return angleDegrees;
-}
-
-    const [faces, setFaces] = React.useState<Face[]>([]);
-    const requestRef = React.useRef<number>(0);
-    const setFacingMode = useCamStore((state) => state.setFacingMode);
-    const windowSize = useWindowSize();
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const emaKeypointsRef = React.useRef<any>({});
-    const leftEyeTragionIndex = 4;
-    const rightEyeTragionIndex = 5;
-    const noseTipIndex = 2;
-    const alpha = 0.2;
-
-    async function setupFaceDetector() {
-        const faceDetector = await getFaceDetector1();
-        faceDetectorRef.current = faceDetector;
-        setFaces([]);
+    function stopFaceDetection() {
+        stopVideo(videoRef.current);
+        isFaceDetectionRunningRef.current = false;
     }
-
-    const lastVideoTimeRef = React.useRef<number>(-1);
-    async function predictFacePositions() {
-        let nowInMs = Date.now();
-        if (videoRef.current && lastVideoTimeRef.current !== videoRef.current.currentTime) {
-            lastVideoTimeRef.current = videoRef.current.currentTime;
-            // 1. FACE DETECTOR
-            const faceDetectorResult = await (faceDetectorRef.current as FaceDetector)?.detectForVideo(videoRef.current, nowInMs);
-            const updatedFaces: Face[] = get(faceDetectorResult, 'detections', []).map((detection: Detection, index) => {
-                const faceId = `face-${index}`;
-
-                // Initialize EMA keypoints for the face if it doesn't exist
-                if (!emaKeypointsRef.current[faceId]) {
-                    emaKeypointsRef.current[faceId] = detection.keypoints.map((kp) => ({ x: kp.x, y: kp.y }));
-                }
-
-                const updatedKeypoints = detection.keypoints.map((keypoint, keypointIndex) => {
-                    // Ensure there's a corresponding EMA point to update
-                    if (!emaKeypointsRef.current[faceId][keypointIndex]) {
-                        emaKeypointsRef.current[faceId][keypointIndex] = { x: keypoint.x, y: keypoint.y };
-                    }
-
-                    const currentEma = emaKeypointsRef.current[faceId][keypointIndex];
-                    const emaX = currentEma.x * (1 - alpha) + keypoint.x * alpha;
-                    const emaY = currentEma.y * (1 - alpha) + keypoint.y * alpha;
-
-                    // Update the EMA value for the current face and keypoint
-                    emaKeypointsRef.current[faceId][keypointIndex] = { x: emaX, y: emaY };
-
-                    return { x: emaX, y: emaY };
-                });
-
-                // Your existing code to calculate face roll, width, height, etc., using updatedKeypoints
-                const leftEyeTragion = updatedKeypoints[leftEyeTragionIndex];
-                const rightEyeTragion = updatedKeypoints[rightEyeTragionIndex];
-                const faceRoll = calculateFaceRoll(
-                    [leftEyeTragion?.x, leftEyeTragion?.y],
-                    [rightEyeTragion?.x, rightEyeTragion?.y]
-                );
-                const width = getDistanceBetweenPoints(leftEyeTragion, rightEyeTragion) * windowSize.width;
-                const height = width;
-                const videoHeight = videoRef.current?.videoHeight || 0;
-                const videoWidth = videoRef.current?.videoWidth || 0;
-                const boundingBox = {
-                    left: 0,
-                    top: 0,
-                    rotation: faceRoll,
-                    center: updatedKeypoints[noseTipIndex],
-                    width,
-                    height: width,
-                };
-                const normalizedWidth = width / videoWidth;
-                const normalizedHeight = height / videoHeight;
-                const normalizedBoundingBox = {
-                    top: updatedKeypoints[noseTipIndex]?.y - normalizedHeight / 2,
-                    left: (1 - updatedKeypoints[noseTipIndex]?.x) - normalizedWidth / 2,
-                    width: normalizedWidth,
-                    height: normalizedHeight,
-                    rotation: faceRoll,
-                };
-                return {
-                    id: index + '',
-                    boundingBox,
-                    normalizedBoundingBox,
-                    absentFrames: 0,
-                    avatarUrl,
-                };
-            });
-            setFaces(updatedFaces);
-
-        }
-        requestRef.current = window.requestAnimationFrame(predictFacePositions);
-    };
 
     React.useEffect(() => {
         return () => {
-            cancelAnimationFrame(requestRef.current);
-        };
+            stopFaceDetection();
+        }
     }, []);
 
-    async function startFaceDetection() {
-        await setupFaceDetector();
-        await getUserMedia({
-            facingMode: 'user',
-            videoElement: videoRef.current as HTMLVideoElement,
-            onLoaded: () => {
-                console.log('User media loaded');
-            }
-        });
-        setFacingMode('user');
-        setFaces([]);
-        videoRef.current?.addEventListener("loadeddata", predictFacePositions);
-    };
+    return { startFaceDetection, stopFaceDetection };
 
-    return {
-        startFaceDetection,
-        faces,
-        predictFacePositions,
-        setupFaceDetector
-    };
-    */
+}

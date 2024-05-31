@@ -1,7 +1,7 @@
 {
   "name": "use-mediapipe",
   "private": true,
-  "version": "1.0.11",
+  "version": "1.0.28",
   "description": "React hooks for MediaPipe",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -9,6 +9,9 @@
     "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "pre-push": [
+    "build"
+  ],
   "keywords": [
     "react",
     "mediapipe"
@@ -26,9 +29,11 @@
   "devDependencies": {
     "@types/node": "^20.11.25",
     "@types/react": "^18.2.64",
+    "pre-push": "^0.1.4",
     "typescript": "^5.4.2"
   },
   "dependencies": {
+    "@mediapipe/selfie_segmentation": "^0.1.1675465747",
     "@mediapipe/tasks-vision": "^0.10.12",
     "deepmerge": "^4.3.1",
     "react": "^18.2.0"

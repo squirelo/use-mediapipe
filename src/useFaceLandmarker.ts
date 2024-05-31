@@ -1,11 +1,13 @@
 import React from "react";
 import deepmerge from "deepmerge";
-import { FaceLandmarker, FaceLandmarkerOptions, FaceLandmarkerResult, FilesetResolver } from "@mediapipe/tasks-vision";
+import { FilesetResolver, FaceLandmarker, FaceLandmarkerOptions, FaceLandmarkerResult } from "@mediapipe/tasks-vision";
 import { RunningMode } from "./types";
 import canPlayStream from "./canPlayStream";
-import { defaultUserMediaOptions } from "./utils";
+import { tasksVisionVersion, defaultUserMediaOptions } from "./const";
+import canReadVideo from "./canReadVideo";
+import stopVideo from "./stopVideo";
 
-export { FaceLandmarker, FaceLandmarkerOptions, FaceLandmarkerResult };
+export type { FaceLandmarker, FaceLandmarkerOptions, FaceLandmarkerResult };
 
 export const defaultFaceLandmarkerOptions: FaceLandmarkerOptions = {
     baseOptions: {
@@ -20,7 +22,7 @@ export const defaultFaceLandmarkerOptions: FaceLandmarkerOptions = {
 
 export async function getFaceLandmarker(options: FaceLandmarkerOptions = {}) {
     const vision = await FilesetResolver.forVisionTasks(
-        "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm"
+        `https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@${tasksVisionVersion}/wasm`
     );
     const faceLandmarkerOptions: FaceLandmarkerOptions = deepmerge(defaultFaceLandmarkerOptions, options);
     const faceLandmarker = await FaceLandmarker.createFromOptions(vision, faceLandmarkerOptions);
@@ -34,20 +36,19 @@ export function useFaceLandmarker({
 }) {
     const videoRef = React.useRef<HTMLVideoElement | null>(null);
     const faceLandmarkerRef = React.useRef<FaceLandmarker>();
-    const lastVideoTimeRef = React.useRef<number>(-1);
+    const isFaceLandmarkerRunningRef = React.useRef<boolean>(false);
 
     async function predictFaceLandmarks(time: number, stream?: MediaStream) {
-        if (!videoRef.current || !faceLandmarkerRef.current) return;
-        const currentTime = videoRef.current.currentTime;
-        if (canPlayStream(stream) && currentTime > lastVideoTimeRef.current && videoRef.current.videoWidth > 0 && videoRef.current.videoHeight > 0) {
-            lastVideoTimeRef.current = currentTime;
-            const results = await faceLandmarkerRef.current?.detectForVideo(videoRef.current, time);
+        if (!isFaceLandmarkerRunningRef.current) return;
+        if (canPlayStream(stream) && canReadVideo(videoRef.current) && faceLandmarkerRef.current) {
+            const video = videoRef.current as HTMLVideoElement;
+            const results = await faceLandmarkerRef.current?.detectForVideo(video, time);
             onResults?.(results, stream);
         }
         videoRef.current?.requestVideoFrameCallback((time) => predictFaceLandmarks(time, stream));
     }
 
-    async function startFaceTracking({
+    async function startFaceLandmarker({
         stream,
         faceLandmarkerOptions,
         userMediaOptions,
@@ -60,6 +61,7 @@ export function useFaceLandmarker({
             faceLandmarkerOptions: undefined,
             userMediaOptions: undefined,
         }) {
+        isFaceLandmarkerRunningRef.current = true;
         faceLandmarkerRef.current = await getFaceLandmarker(faceLandmarkerOptions);
         videoRef.current = document.createElement("video");
         videoRef.current.muted = true;
@@ -78,6 +80,17 @@ export function useFaceLandmarker({
 
     }
 
-    return startFaceTracking;
+    function stopFaceLandmarker() {
+        stopVideo(videoRef.current);
+        isFaceLandmarkerRunningRef.current = false;
+    }
+
+    React.useEffect(() => {
+        return () => {
+            stopFaceLandmarker();
+        }
+    }, []);
+
+    return { startFaceLandmarker, stopFaceLandmarker };
 
 }

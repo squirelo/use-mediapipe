@@ -6,9 +6,9 @@ export declare function useFaceDetector({ onResults, }: {
     onResults: (result: FaceDetectorResult, stream?: MediaStream) => void;
 }): {
     startFaceDetection: ({ stream, faceDetectorOptions, userMediaOptions, }?: {
-        stream?: MediaStream | undefined;
-        faceDetectorOptions?: FaceDetectorOptions | undefined;
-        userMediaOptions?: MediaStreamConstraints | undefined;
+        stream?: MediaStream;
+        faceDetectorOptions?: FaceDetectorOptions;
+        userMediaOptions?: MediaStreamConstraints;
     }) => Promise<void>;
     stopFaceDetection: () => void;
 };

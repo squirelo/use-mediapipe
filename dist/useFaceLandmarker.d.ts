@@ -6,9 +6,9 @@ export declare function useFaceLandmarker({ onResults, }: {
     onResults: (result: FaceLandmarkerResult, stream?: MediaStream) => void;
 }): {
     startFaceLandmarker: ({ stream, faceLandmarkerOptions, userMediaOptions, }?: {
-        stream?: MediaStream | undefined;
-        faceLandmarkerOptions?: FaceLandmarkerOptions | undefined;
-        userMediaOptions?: MediaStreamConstraints | undefined;
+        stream?: MediaStream;
+        faceLandmarkerOptions?: FaceLandmarkerOptions;
+        userMediaOptions?: MediaStreamConstraints;
     }) => Promise<void>;
     stopFaceLandmarker: () => void;
 };

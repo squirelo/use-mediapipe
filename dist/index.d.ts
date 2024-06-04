@@ -1,6 +1,7 @@
 export * from './useFaceDetector';
 export * from './useFaceLandmarker';
 export * from './useHandLandmarker';
+export * from './usePoseLandmarker';
 export * from './useGestureRecognizer';
 export * from './useImageSegmenter';
 export * from './useSelfieSegmenter';

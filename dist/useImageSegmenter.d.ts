@@ -6,9 +6,9 @@ export declare function useImageSegmenter({ onResults, }: {
     onResults: (result: ImageSegmenterResult, stream?: MediaStream) => void;
 }): {
     startImageSegmenter: ({ stream, imageSegmenterOptions, userMediaOptions, }?: {
-        stream?: MediaStream | undefined;
-        imageSegmenterOptions?: ImageSegmenterOptions | undefined;
-        userMediaOptions?: MediaStreamConstraints | undefined;
+        stream?: MediaStream;
+        imageSegmenterOptions?: ImageSegmenterOptions;
+        userMediaOptions?: MediaStreamConstraints;
     }) => Promise<void>;
     stopImageSegmenter: () => void;
 };

@@ -13,9 +13,9 @@ export declare function useGestureRecognizer({ onResults, }: {
     onResults: (result: GestureRecognizerResult, stream?: MediaStream) => void;
 }): {
     startGestureTracking: ({ stream, gestureRecognizerOptions, userMediaOptions, }?: {
-        stream?: MediaStream | undefined;
-        gestureRecognizerOptions?: GestureRecognizerOptions | undefined;
-        userMediaOptions?: MediaStreamConstraints | undefined;
+        stream?: MediaStream;
+        gestureRecognizerOptions?: GestureRecognizerOptions;
+        userMediaOptions?: MediaStreamConstraints;
     }) => Promise<void>;
     stopGestureTracking: () => void;
 };

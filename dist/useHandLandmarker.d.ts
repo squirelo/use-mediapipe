@@ -6,9 +6,9 @@ export declare function useHandLandmarker({ onResults, }: {
     onResults: (result: HandLandmarkerResult, stream?: MediaStream) => void;
 }): {
     startHandLandmarker: ({ stream, handLandmarkerOptions, userMediaOptions, }?: {
-        stream?: MediaStream | undefined;
-        handLandmarkerOptions?: HandLandmarkerOptions | undefined;
-        userMediaOptions?: MediaStreamConstraints | undefined;
+        stream?: MediaStream;
+        handLandmarkerOptions?: HandLandmarkerOptions;
+        userMediaOptions?: MediaStreamConstraints;
     }) => Promise<void>;
     stopHandLandmarker: () => void;
 };

@@ -4,9 +4,9 @@ export declare function useSelfieSegmenter({ onResults, }: {
     onResults: (result: SelfieSegmentationResult, stream?: MediaStream) => void;
 }): {
     startSelfieSegmenter: ({ stream, selfieSegmentationOptions, userMediaOptions, }?: {
-        stream?: MediaStream | undefined;
-        selfieSegmentationOptions?: SelfieSegmentationOptions | undefined;
-        userMediaOptions?: MediaStreamConstraints | undefined;
+        stream?: MediaStream;
+        selfieSegmentationOptions?: SelfieSegmentationOptions;
+        userMediaOptions?: MediaStreamConstraints;
     }) => Promise<void>;
     stopSelfieSegmenter: () => void;
 };

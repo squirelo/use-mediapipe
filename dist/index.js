@@ -21,6 +21,7 @@ exports.stopVideo = exports.canReadVideo = exports.canPlayStream = void 0;
 __exportStar(require("./useFaceDetector"), exports);
 __exportStar(require("./useFaceLandmarker"), exports);
 __exportStar(require("./useHandLandmarker"), exports);
+__exportStar(require("./usePoseLandmarker"), exports);
 __exportStar(require("./useGestureRecognizer"), exports);
 __exportStar(require("./useImageSegmenter"), exports);
 __exportStar(require("./useSelfieSegmenter"), exports);
